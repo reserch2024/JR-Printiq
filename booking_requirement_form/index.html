@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JR Printiq | Secure Your Booking</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+Devanagari:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../shared/design-tokens.js"></script>
+<script src="../shared/components.js"></script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-card-shadow {
+            box-shadow: 0 4px 12px rgba(11, 47, 107, 0.05);
+        }
+        .input-focus-glow:focus {
+            outline: none;
+            border-color: #003ea3;
+            box-shadow: 0 0 0 2px rgba(0, 62, 163, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<div id="header-mount"></div>
+<main class="max-w-max_width mx-auto px-gutter pt-24 pb-xl">
+<div class="max-w-3xl mx-auto">
+<!-- Step Header -->
+<div class="mb-lg">
+<h1 class="font-h1 text-h1-mobile md:text-h1 mb-base">Booking Details</h1>
+<p class="text-on-surface-variant text-body-md font-body-md">Tell us about your printing requirements to get an accurate quote.</p>
+</div>
+<!-- Selected Design Summary (Locked) -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md mb-lg form-card-shadow flex items-center gap-md">
+<div class="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A professional high-end photograph of a luxury wedding invitation card with gold foil accents on premium textured paper. The lighting is soft and elegant, highlighting the intricate floral patterns and the rich cream color of the invitation. The setting is a minimalist, modern studio with clean white surfaces, reflecting the Smart Printing brand identity of JR Printiq." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZsYdU3_HNH1j0Qkab88WH-cX-B3yqsSXiMvouJe5UkT0GnXEhdXtaaqo7aV4Q0N9TThcq-kFpTQcpwL2MMGeJyZVdc8VuaYax_BF7NqMgKt6rR5NJhQ5ma3NcMLE1o5SwQ9xdcDUWDNlOwzqz7oevMO08AhAbC7D5gRYKtwbXjOfdguAoTC3gbjsGDu7ni8oZ0VIpByUx7VJ38QUkFEvCcOFVDBboZPKyxeYsmZHZvbEvwnQZlIjypzBFJIN2FkaTETzUZSG-cvLk"/>
+</div>
+<div class="flex-grow">
+<span class="text-label-caps font-label-caps text-primary uppercase tracking-widest block mb-xs">Selected Design</span>
+<h2 class="text-h3 font-h3 mb-xs">Royal Heritage Invitation Set</h2>
+<div class="flex items-center text-body-sm font-body-sm text-on-surface-variant gap-xs">
+<span class="material-symbols-outlined text-sm" style="font-size: 16px;">lock</span>
+                        Design Locked
+                    </div>
+</div>
+<div class="hidden sm:block">
+<a href="../catalog_wedding_cards/index.html" class="text-primary font-bold text-body-sm font-body-sm hover:underline">Change Design</a>
+</div>
+</div>
+<!-- Requirement Form -->
+<form class="space-y-md" id="bookingForm">
+<!-- Section 1: Card Text Details -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg form-card-shadow">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+<h3 class="text-h3 font-h3">Card Text Details</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Main Names ( दूल्हा-दुल्हन का नाम )</label>
+<input id="names-input" required class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="e.g. Rahul &amp; Sneha" type="text"/>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Event Date &amp; Time ( कार्यक्रम की तिथि )</label>
+<input id="event-date-input" class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" type="datetime-local"/>
+</div>
+<div class="md:col-span-2">
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Venue Address ( कार्यक्रम स्थल का पता )</label>
+<textarea id="venue-input" class="w-full p-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="Complete address of the venue..." rows="2"></textarea>
+</div>
+<div class="md:col-span-2 space-y-md" id="family-names-container">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Host / Family Name ( आयोजक का नाम )</label>
+<input class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow family-name-field" placeholder="e.g. Mr. &amp; Mrs. Sharma" type="text"/>
+</div>
+</div>
+<div class="md:col-span-2">
+<button class="flex items-center gap-xs text-primary font-bold text-body-sm font-body-sm" onclick="addFamilyRow()" type="button">
+<span class="material-symbols-outlined">add_circle</span>
+                                Add More Names
+                            </button>
+</div>
+</div>
+</section>
+<!-- Section 2: Printing Options -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg form-card-shadow">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">print</span>
+<h3 class="text-h3 font-h3">Printing Options</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Language for Text</label>
+<select id="language-select" class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow appearance-none bg-white">
+<option>Hindi (हिंदी)</option>
+<option>English</option>
+<option>Both (Bilingual)</option>
+</select>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Quantity Needed (Pcs)</label>
+<input id="quantity-input" required class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="Min. 50" type="number"/>
+</div>
+</div>
+</section>
+<!-- Section 3: Reference Upload -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg form-card-shadow">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">upload_file</span>
+<h3 class="text-h3 font-h3">Reference Upload</h3>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-[10px] p-xl flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:scale-110 transition-transform mb-sm" style="font-size: 48px;">cloud_upload</span>
+<p class="text-body-md font-body-md font-semibold">Click to upload or drag images/PDF</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-xs">Upload sample designs or existing drafts.</p>
+<input class="hidden" id="fileUpload" multiple="" type="file"/>
+</div>
+<p class="text-label-caps font-label-caps text-on-surface-variant mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" style="font-size: 14px;">info</span>
+                        Note: You'll receive a copy of everything you upload via email/WhatsApp.
+                    </p>
+</section>
+<!-- Section 4: Delivery -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg form-card-shadow">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<h3 class="text-h3 font-h3">Delivery Details</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">City</label>
+<input id="city-input" required class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="e.g. Lucknow" type="text"/>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Pincode</label>
+<input id="pincode-input" required class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="226001" type="text"/>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Preferred Date</label>
+<input id="pref-date-input" class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" type="date"/>
+</div>
+</div>
+</section>
+<!-- Section 5: Contact -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg form-card-shadow">
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">contact_phone</span>
+<h3 class="text-h3 font-h3">Contact Information</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-md">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Phone (Mandatory)*</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">+91</span>
+<input id="phone-input" class="w-full h-12 pl-12 pr-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="98765 43210" required="" type="tel"/>
+</div>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Email (Optional)</label>
+<input id="email-input" class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary" id="whatsappOpt" type="checkbox"/>
+<label class="text-body-sm font-body-sm text-on-surface-variant" for="whatsappOpt">Send me updates and final proofing on WhatsApp.</label>
+</div>
+</section>
+<!-- Form Submission -->
+<div class="pt-md text-center">
+<button class="w-full md:w-auto min-w-[280px] h-14 bg-primary text-on-primary font-bold text-body-lg font-body-lg rounded-[10px] shadow-lg hover:bg-primary/90 transition-all active:scale-95 mb-md" type="submit">
+                        Submit Booking
+                    </button>
+<p class="text-body-sm font-body-sm text-on-surface-variant italic px-md">
+                        Our team will contact you on WhatsApp/call shortly to confirm final pricing and design details.
+                    </p>
+</div>
+</form>
+</div>
+</main>
+<!-- Footer -->
+<div id="footer-mount"></div>
+<div id="fab-mount"></div>
+
+<script>
+        document.getElementById('header-mount').innerHTML = renderHeader('', '../');
+        document.getElementById('footer-mount').innerHTML = renderFooter('../');
+        document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const designId = urlParams.get('id') || 'D004';
+        const design = JRData.getCatalog().find(d => d.id === designId) || JRData.getCatalog()[3];
+
+        if (design) {
+            document.querySelector('.bg-surface-container-lowest h2.text-h3').textContent = design.name_en;
+            if (design.image) {
+                document.querySelector('.bg-surface-container-lowest img').src = design.image;
+            }
+        }
+
+        function addFamilyRow() {
+            const container = document.getElementById('family-names-container');
+            const div = document.createElement('div');
+            div.className = 'animate-in fade-in slide-in-from-top-2 duration-300 relative';
+            div.innerHTML = `
+                <div class="flex gap-sm items-end">
+                    <div class="flex-grow">
+                        <label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Host / Family Name ( आयोजक का नाम )</label>
+                        <input type="text" placeholder="e.g. Grandma & Grandpa" class="w-full h-12 px-md border border-outline-variant rounded-[10px] input-focus-glow family-name-field">
+                    </div>
+                    <button type="button" onclick="this.closest('.relative').remove()" class="h-12 w-12 flex items-center justify-center text-error hover:bg-error/10 rounded-[10px] transition-colors">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // Dropzone interaction
+        const dropzone = document.querySelector('section:has(#fileUpload) > div');
+        const fileInput = document.getElementById('fileUpload');
+
+        if (dropzone && fileInput) {
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('bg-primary/5', 'border-primary');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('bg-primary/5', 'border-primary');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('bg-primary/5', 'border-primary');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    alert(`${e.dataTransfer.files.length} file(s) attached.`);
+                }
+            });
+        }
+
+        // Handle submit
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const familyNames = Array.from(document.querySelectorAll('.family-name-field'))
+                .map(input => input.value.trim())
+                .filter(val => val !== '');
+
+            const booking = {
+                designId: designId,
+                designName: design ? design.name_en : 'Royal Heritage Invitation Set',
+                names: document.getElementById('names-input').value.trim(),
+                eventDate: document.getElementById('event-date-input').value,
+                venue: document.getElementById('venue-input').value.trim(),
+                familyNames: familyNames,
+                language: document.getElementById('language-select').value,
+                quantity: parseInt(document.getElementById('quantity-input').value) || 100,
+                city: document.getElementById('city-input').value.trim(),
+                pincode: document.getElementById('pincode-input').value.trim(),
+                preferredDate: document.getElementById('pref-date-input').value,
+                phone: document.getElementById('phone-input').value.trim(),
+                email: document.getElementById('email-input').value.trim(),
+                whatsappOptIn: document.getElementById('whatsappOpt').checked
+            };
+
+            const saved = JRData.saveBooking(booking);
+            alert(`Booking submitted successfully! Your Booking ID is ${saved.id}. You will receive a copy via WhatsApp/email.`);
+            window.location.href = `../booking_confirmation/index.html?id=${saved.id}`;
+        });
+
+        applyLanguage(JRData.getLanguage());
+    </script>
+</body>
+</html>

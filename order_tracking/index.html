@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JR Printiq | Track Your Order</title>
+    <meta name="description" content="Track your JR Printiq print order status in real-time using your Booking ID.">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="../shared/design-tokens.js"></script>
+    <script src="../shared/components.js"></script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F7F9FC; }
+        .card-shadow { box-shadow: 0 4px 12px rgba(11,47,107,0.05); }
+        .timeline-line { position: absolute; left: 23px; top: 48px; bottom: 0; width: 2px; }
+        .step-pulse { animation: stepPulse 2s ease-in-out infinite; }
+        @keyframes stepPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(30,86,200,0.3); } 50% { box-shadow: 0 0 0 8px rgba(30,86,200,0); } }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen">
+    <div id="header-mount"></div>
+
+    <main class="pt-24 pb-xl max-w-max_width mx-auto px-gutter">
+        <!-- Lookup Form -->
+        <div id="lookup-section" class="max-w-xl mx-auto">
+            <div class="text-center mb-lg">
+                <div class="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-md">
+                    <span class="material-symbols-outlined text-primary" style="font-size:32px">location_searching</span>
+                </div>
+                <h1 class="text-h1-mobile md:text-h1 font-h1 mb-base" data-en="Track Your Order" data-hi="अपना ऑर्डर ट्रैक करें">Track Your Order</h1>
+                <p class="text-body-lg text-on-surface-variant" data-en="Enter your Booking ID and phone number to view order status." data-hi="ऑर्डर स्थिति देखने के लिए अपनी बुकिंग आईडी और फोन नंबर दर्ज करें।">Enter your Booking ID and phone number to view order status.</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg card-shadow">
+                <form onsubmit="lookupOrder(event)" class="space-y-md">
+                    <div>
+                        <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Booking ID</label>
+                        <input type="text" id="lookup-id" placeholder="e.g. JR-X7K9M2" required
+                            class="w-full h-14 px-md border border-outline-variant rounded-[10px] text-h3 font-h3 text-center tracking-widest uppercase focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Phone Number</label>
+                        <div class="relative">
+                            <span class="absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant font-semibold">+91</span>
+                            <input type="tel" id="lookup-phone" placeholder="98765 43210" required
+                                class="w-full h-14 pl-14 pr-md border border-outline-variant rounded-[10px] focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full h-14 bg-primary text-on-primary font-bold text-body-lg rounded-[10px] shadow-md hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-sm">
+                        <span class="material-symbols-outlined">search</span>
+                        Track Order
+                    </button>
+                </form>
+                <div id="lookup-error" class="hidden mt-md bg-[#C0392B]/10 border border-[#C0392B]/20 rounded-lg p-sm text-center text-[#C0392B] text-body-sm font-semibold">
+                    <span class="material-symbols-outlined align-middle mr-1" style="font-size:16px">error</span>
+                    No booking found. Please check your ID and phone number.
+                </div>
+                <!-- Demo hint -->
+                <div class="mt-md p-sm bg-primary/5 rounded-lg border border-primary/10">
+                    <p class="text-body-sm text-primary font-medium text-center">
+                        <span class="material-symbols-outlined align-middle mr-1" style="font-size:14px">lightbulb</span>
+                        Demo: Try ID <strong>JR-X7K9M2</strong> with phone <strong>7376550040</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Results (hidden initially) -->
+        <div id="tracking-section" class="hidden max-w-3xl mx-auto">
+            <button onclick="showLookup()" class="flex items-center gap-xs text-primary font-bold mb-md hover:underline">
+                <span class="material-symbols-outlined">arrow_back</span> Search Another Order
+            </button>
+
+            <!-- Order Header -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow mb-lg overflow-hidden">
+                <div class="bg-primary/5 border-b border-outline-variant/20 p-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
+                    <div>
+                        <p class="text-label-caps font-label-caps text-primary uppercase tracking-widest">Booking ID</p>
+                        <h2 class="text-h2 font-h2" id="track-booking-id"></h2>
+                    </div>
+                    <div id="track-status-badge"></div>
+                </div>
+                <div class="p-md grid grid-cols-2 sm:grid-cols-4 gap-sm" id="track-summary">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md md:p-lg">
+                <h3 class="text-h3 font-h3 mb-lg flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-primary">timeline</span>
+                    Order Timeline
+                </h3>
+                <div class="relative" id="timeline-container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Action Box -->
+            <div id="action-box" class="mt-lg bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md hidden">
+                <!-- Populated based on status -->
+            </div>
+
+            <!-- Contact CTA -->
+            <div class="mt-lg text-center">
+                <p class="text-on-surface-variant mb-sm">Have questions about your order?</p>
+                <a href="https://wa.me/917376550040" target="_blank" class="inline-flex items-center gap-sm bg-[#25D366] text-white font-bold px-lg py-3 rounded-brand hover:bg-[#25D366]/90 transition-all active:scale-95">
+                    <svg fill="currentColor" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.305 1.652zm6.599-3.835c1.522.902 3.271 1.379 5.063 1.38h.005c5.448 0 9.882-4.433 9.885-9.88.001-2.641-1.03-5.123-2.903-6.997s-4.355-2.905-6.998-2.905c-5.443 0-9.876 4.433-9.879 9.879-.001 1.892.536 3.733 1.554 5.337l-1.023 3.73 3.826-1.004zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    Chat with Us on WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-mount"></div>
+    <div id="fab-mount"></div>
+
+    <script>
+        document.getElementById('header-mount').innerHTML = renderHeader('track-order', '../');
+        document.getElementById('footer-mount').innerHTML = renderFooter('../');
+        document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+        // Check URL params for direct tracking links
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('id')) {
+            document.getElementById('lookup-id').value = urlParams.get('id');
+            if (urlParams.get('phone')) {
+                document.getElementById('lookup-phone').value = urlParams.get('phone');
+            }
+        }
+
+        function lookupOrder(e) {
+            e.preventDefault();
+            const id = document.getElementById('lookup-id').value.trim().toUpperCase();
+            const phone = document.getElementById('lookup-phone').value.trim().replace(/\s/g, '');
+
+            const booking = JRData.getBookings().find(b => {
+                const bPhone = (b.phone || '').replace(/\s/g, '');
+                return b.id === id && (bPhone.includes(phone) || phone.includes(bPhone));
+            });
+
+            if (!booking) {
+                document.getElementById('lookup-error').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('lookup-error').classList.add('hidden');
+            showTracking(booking);
+        }
+
+        function showLookup() {
+            document.getElementById('lookup-section').classList.remove('hidden');
+            document.getElementById('tracking-section').classList.add('hidden');
+        }
+
+        function showTracking(booking) {
+            document.getElementById('lookup-section').classList.add('hidden');
+            document.getElementById('tracking-section').classList.remove('hidden');
+
+            document.getElementById('track-booking-id').textContent = booking.id;
+            document.getElementById('track-status-badge').innerHTML = getStatusBadgeHTML(booking.status);
+
+            // Summary cards
+            document.getElementById('track-summary').innerHTML = `
+                <div class="flex flex-col"><span class="text-label-caps font-label-caps text-on-surface-variant/70">Design</span><span class="font-semibold text-body-sm">${booking.designName}</span></div>
+                <div class="flex flex-col"><span class="text-label-caps font-label-caps text-on-surface-variant/70">Quantity</span><span class="font-semibold text-body-sm">${booking.quantity} pcs</span></div>
+                <div class="flex flex-col"><span class="text-label-caps font-label-caps text-on-surface-variant/70">Delivery</span><span class="font-semibold text-body-sm">${booking.city || '—'}</span></div>
+                <div class="flex flex-col"><span class="text-label-caps font-label-caps text-on-surface-variant/70">Booked</span><span class="font-semibold text-body-sm">${formatDate(booking.createdAt)}</span></div>
+            `;
+
+            // Build timeline
+            const currentStatusIdx = STATUS_TIMELINE_ORDER.indexOf(booking.status);
+            const completedStatuses = (booking.statusHistory || []).map(h => h.status);
+            
+            let timelineHTML = '';
+            STATUS_TIMELINE_ORDER.forEach((step, idx) => {
+                const cfg = STATUS_CONFIG[step];
+                const historyEntry = (booking.statusHistory || []).find(h => h.status === step);
+                const isCompleted = completedStatuses.includes(step);
+                const isCurrent = booking.status === step;
+                const isPending = !isCompleted && !isCurrent;
+
+                let dotClass, lineColor, textClass;
+                if (isCompleted && !isCurrent) {
+                    dotClass = 'bg-[#2E8B57] text-white';
+                    lineColor = 'bg-[#2E8B57]';
+                    textClass = 'text-on-surface';
+                } else if (isCurrent) {
+                    dotClass = 'bg-primary text-white step-pulse';
+                    lineColor = 'bg-primary';
+                    textClass = 'text-on-surface font-bold';
+                } else {
+                    dotClass = 'bg-surface-container-high text-outline border-2 border-outline-variant';
+                    lineColor = 'bg-outline-variant/30';
+                    textClass = 'text-on-surface-variant/50';
+                }
+
+                const isLast = idx === STATUS_TIMELINE_ORDER.length - 1;
+
+                timelineHTML += `
+                <div class="relative flex gap-md pb-8 ${isLast ? 'pb-0' : ''}">
+                    ${!isLast ? `<div class="timeline-line ${isCompleted ? 'bg-[#2E8B57]' : isCurrent ? 'bg-primary/30' : 'bg-outline-variant/30'}"></div>` : ''}
+                    <div class="w-12 h-12 rounded-full ${dotClass} flex items-center justify-center flex-shrink-0 z-10 transition-all">
+                        <span class="material-symbols-outlined" style="font-size:20px;${isCompleted && !isCurrent ? "font-variation-settings:'FILL' 1" : ''}">${isCompleted && !isCurrent ? 'check_circle' : cfg.icon}</span>
+                    </div>
+                    <div class="flex-grow pt-1.5">
+                        <p class="${textClass} text-body-md">${cfg.label}</p>
+                        ${historyEntry ? `<p class="text-body-sm text-on-surface-variant mt-0.5">${formatDateTime(historyEntry.date)}${historyEntry.note ? ' — ' + historyEntry.note : ''}</p>` : ''}
+                        ${isCurrent && !isLast ? `<p class="text-body-sm text-primary mt-1 font-medium">⏳ In progress...</p>` : ''}
+                    </div>
+                </div>`;
+            });
+            document.getElementById('timeline-container').innerHTML = timelineHTML;
+
+            // Action box based on status
+            const actionBox = document.getElementById('action-box');
+            if (booking.status === 'proof_sent') {
+                actionBox.classList.remove('hidden');
+                actionBox.innerHTML = `
+                    <div class="flex items-center gap-md">
+                        <div class="w-12 h-12 bg-[#C98A1F]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[#C98A1F]">preview</span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-bold text-on-surface">Your proof is ready for review!</p>
+                            <p class="text-body-sm text-on-surface-variant">Please review and approve the proof to proceed with printing.</p>
+                        </div>
+                        <a href="../proof_approval/index.html?id=${booking.id}" class="bg-primary text-on-primary font-bold px-lg py-3 rounded-brand hover:bg-primary/90 transition-all active:scale-95 whitespace-nowrap">
+                            Review Proof
+                        </a>
+                    </div>`;
+            } else if (booking.status === 'price_change_pending') {
+                actionBox.classList.remove('hidden');
+                actionBox.innerHTML = `
+                    <div class="flex items-center gap-md">
+                        <div class="w-12 h-12 bg-[#C98A1F]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[#C98A1F]">currency_rupee</span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-bold text-on-surface">Price update requires your approval</p>
+                            <p class="text-body-sm text-on-surface-variant">The final price differs from the estimate. Please review.</p>
+                        </div>
+                        <a href="../price_change_notice/index.html?id=${booking.id}" class="bg-[#C98A1F] text-white font-bold px-lg py-3 rounded-brand hover:opacity-90 transition-all active:scale-95 whitespace-nowrap">
+                            Review Price
+                        </a>
+                    </div>`;
+            } else {
+                actionBox.classList.add('hidden');
+            }
+        }
+
+        applyLanguage(JRData.getLanguage());
+    </script>
+</body>
+</html>

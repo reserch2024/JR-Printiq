@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JR Printiq | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="../shared/design-tokens.js"></script>
+    <script src="../shared/components.js"></script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F7F9FC; }
+        .sidebar-transition { transition: all 0.3s ease; }
+        .card-shadow { box-shadow: 0 4px 12px rgba(11,47,107,0.05); }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col md:flex-row">
+    <!-- Mobile Dashboard Header -->
+    <header class="bg-primary-container text-on-primary w-full h-16 px-gutter flex items-center justify-between md:hidden fixed top-0 left-0 z-50">
+        <span class="text-h3 font-bold">JR Admin</span>
+        <button onclick="toggleMobileSidebar()" class="p-1">
+            <span class="material-symbols-outlined text-on-primary" id="mobile-menu-icon">menu</span>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="bg-primary-container text-on-primary w-64 fixed top-0 bottom-0 left-0 z-40 transform -translate-x-full md:translate-x-0 sidebar-transition flex flex-col justify-between pt-16 md:pt-0">
+        <div class="p-md space-y-md">
+            <!-- Brand Logo/Header -->
+            <div class="hidden md:flex items-center gap-sm pb-md border-b border-on-primary/10">
+                <span class="material-symbols-outlined text-on-primary" style="font-size:32px">admin_panel_settings</span>
+                <div>
+                    <h2 class="text-body-lg font-bold font-h1">JR Printiq</h2>
+                    <p class="text-label-caps opacity-75 uppercase tracking-wider">Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Current User profile info -->
+            <div class="flex items-center gap-sm bg-white/10 p-sm rounded-lg border border-white/10">
+                <span class="material-symbols-outlined text-on-primary bg-primary-fixed-dim/20 w-8 h-8 rounded-full flex items-center justify-center font-bold">person</span>
+                <div class="overflow-hidden">
+                    <p class="text-body-sm font-semibold truncate" id="admin-user-name">JR Admin</p>
+                    <p class="text-[10px] uppercase opacity-75 font-bold" id="admin-user-role">Administrator</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-xs pt-sm">
+                <button onclick="switchTab('bookings')" class="tab-btn w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-white/10 transition-all text-body-sm" id="btn-bookings">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    Bookings Queue
+                </button>
+                <button onclick="switchTab('printers')" class="tab-btn w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-white/10 transition-all text-body-sm" id="btn-printers">
+                    <span class="material-symbols-outlined">print</span>
+                    Printer Contacts
+                </button>
+                <button onclick="switchTab('catalog')" class="tab-btn w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-white/10 transition-all text-body-sm" id="btn-catalog">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    Catalog Manager
+                </button>
+                <button onclick="switchTab('users')" class="tab-btn w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-white/10 transition-all text-body-sm" id="btn-users">
+                    <span class="material-symbols-outlined">group</span>
+                    User Management
+                </button>
+                <button onclick="switchTab('reports')" class="tab-btn w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-white/10 transition-all text-body-sm" id="btn-reports">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    Reports
+                </button>
+            </nav>
+        </div>
+
+        <!-- Log Out Section -->
+        <div class="p-md border-t border-on-primary/10">
+            <button onclick="handleLogout()" class="w-full flex items-center gap-sm px-sm py-3 rounded-brand text-left font-medium hover:bg-[#C0392B] hover:text-white transition-all text-body-sm text-on-primary-container/85">
+                <span class="material-symbols-outlined">logout</span>
+                Log Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pt-20 md:pt-md md:pl-72 pr-gutter pb-xl min-h-screen">
+        <!-- Persistent Unlogged Payments Banner -->
+        <div id="unlogged-payments-banner" class="hidden bg-[#C0392B] text-white p-sm rounded-xl mb-md flex items-center justify-between shadow-lg max-w-5xl mx-auto animate-pulse">
+            <div class="flex items-center gap-sm">
+                <span class="material-symbols-outlined">error</span>
+                <span class="text-body-sm font-semibold" id="unlogged-banner-text">Bookings confirmed but payment not logged!</span>
+            </div>
+            <button onclick="switchTab('bookings')" class="text-label-caps underline hover:text-white/80 font-bold">RESOLVE NOW</button>
+        </div>
+
+        <div class="max-w-5xl mx-auto space-y-lg">
+            <!-- ================= TAB: BOOKINGS QUEUE ================= -->
+            <section id="tab-bookings" class="tab-content space-y-md">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-h2 font-h2 mb-xs">Bookings Queue</h1>
+                        <p class="text-body-sm text-on-surface-variant">View, track, and update all customer print orders</p>
+                    </div>
+                </div>
+
+                <!-- Stats summary row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+                    <div class="bg-surface-container-lowest border border-outline-variant/20 p-sm rounded-xl card-shadow flex items-center gap-sm">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary"><span class="material-symbols-outlined">receipt_long</span></div>
+                        <div><p class="text-label-caps text-on-surface-variant/60 font-bold">Total</p><p class="text-h3 font-h3" id="stat-total">0</p></div>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant/20 p-sm rounded-xl card-shadow flex items-center gap-sm">
+                        <div class="w-10 h-10 bg-[#C98A1F]/10 rounded-full flex items-center justify-center text-[#C98A1F]"><span class="material-symbols-outlined">schedule</span></div>
+                        <div><p class="text-label-caps text-on-surface-variant/60 font-bold">Pending</p><p class="text-h3 font-h3" id="stat-pending">0</p></div>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant/20 p-sm rounded-xl card-shadow flex items-center gap-sm">
+                        <div class="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center text-success"><span class="material-symbols-outlined">check_circle</span></div>
+                        <div><p class="text-label-caps text-on-surface-variant/60 font-bold">Completed</p><p class="text-h3 font-h3" id="stat-completed">0</p></div>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant/20 p-sm rounded-xl card-shadow flex items-center gap-sm">
+                        <div class="w-10 h-10 bg-[#C0392B]/10 rounded-full flex items-center justify-center text-[#C0392B]"><span class="material-symbols-outlined">warning</span></div>
+                        <div><p class="text-label-caps text-on-surface-variant/60 font-bold">Unlogged</p><p class="text-h3 font-h3" id="stat-unlogged">0</p></div>
+                    </div>
+                </div>
+
+                <!-- Bookings Table/List -->
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow overflow-hidden">
+                    <div class="p-md border-b border-outline-variant/20 flex flex-col md:flex-row gap-sm justify-between">
+                        <input type="text" id="booking-search" placeholder="Search by Booking ID, Client Name, Phone..." oninput="renderBookingsQueue()"
+                            class="px-sm h-10 border border-outline-variant rounded-lg focus:ring-1 focus:ring-primary focus:outline-none w-full md:w-80 text-body-sm">
+                        
+                        <div class="flex gap-xs items-center">
+                            <span class="text-label-caps text-on-surface-variant font-bold">Filter status:</span>
+                            <select id="booking-filter" onchange="renderBookingsQueue()" class="h-10 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                                <option value="all">All Orders</option>
+                                <option value="pending_confirmation">Pending Confirmation</option>
+                                <option value="unlogged_payments">Unlogged Payments</option>
+                                <option value="proof_approval">Proof Sent/Approved</option>
+                                <option value="in_production">In Production/Ready</option>
+                                <option value="delivered">Delivered</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Order Info</th>
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Client Details</th>
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Event Date</th>
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Status</th>
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Payment Log</th>
+                                    <th class="p-md text-label-caps text-on-surface-variant/70">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-tbody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: PRINTER CONTACTS ================= -->
+            <section id="tab-printers" class="tab-content space-y-md hidden">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-h2 font-h2 mb-xs">Printer Contact Book</h1>
+                        <p class="text-body-sm text-on-surface-variant">Internal list of specialty print vendors</p>
+                    </div>
+                    <button onclick="openPrinterModal()" class="h-11 bg-primary text-on-primary font-bold px-sm rounded-brand hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-xs text-body-sm">
+                        <span class="material-symbols-outlined">add</span> Add New Printer
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-md" id="printers-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB: CATALOG MANAGER ================= -->
+            <section id="tab-catalog" class="tab-content space-y-md hidden">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-h2 font-h2 mb-xs">Catalog Manager</h1>
+                        <p class="text-body-sm text-on-surface-variant">Configure catalog designs, paper GSMs, finishes, and typical turnarounds</p>
+                    </div>
+                    <button onclick="openDesignModal()" class="h-11 bg-primary text-on-primary font-bold px-sm rounded-brand hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-xs text-body-sm">
+                        <span class="material-symbols-outlined">add</span> Add New Design
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md" id="catalog-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB: USER MANAGEMENT ================= -->
+            <section id="tab-users" class="tab-content space-y-md hidden">
+                <div>
+                    <h1 class="text-h2 font-h2 mb-xs">User Management</h1>
+                    <p class="text-body-sm text-on-surface-variant">Manage staff accounts. Every log action will show "Logged by" the selected staff name.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+                    <!-- Add User Form -->
+                    <div class="md:col-span-5 bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                        <h3 class="text-h3 font-h3 mb-md">Add Staff Account</h3>
+                        <form onsubmit="handleAddStaff(event)" class="space-y-sm">
+                            <div>
+                                <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Staff Full Name</label>
+                                <input type="text" id="staff-name" required placeholder="e.g. Ramesh Kumar"
+                                    class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Username</label>
+                                <input type="text" id="staff-username" required placeholder="e.g. ramesh"
+                                    class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Password</label>
+                                <input type="password" id="staff-password" required placeholder="••••••••"
+                                    class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Role</label>
+                                <select id="staff-role" class="w-full border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none h-11">
+                                    <option value="staff">Staff Member</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full h-11 bg-primary text-on-primary font-bold rounded-lg shadow hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-xs">
+                                <span class="material-symbols-outlined">person_add</span> Save Staff Account
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- User List -->
+                    <div class="md:col-span-7 bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow overflow-hidden">
+                        <div class="p-md border-b border-outline-variant/20">
+                            <h3 class="text-h3 font-h3">Current Staff</h3>
+                        </div>
+                        <ul class="divide-y divide-outline-variant/20" id="staff-list">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Admin Email Config Card -->
+                <div class="bg-surface-container-lowest border border-primary/20 rounded-xl card-shadow p-md mt-md">
+                    <h3 class="text-h3 font-h3 mb-xs flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary">mark_email_read</span>
+                        Admin Notification Email
+                    </h3>
+                    <p class="text-body-sm text-on-surface-variant mb-md">Set your email address to automatically CC yourself on all booking summaries sent from the dashboard.</p>
+                    <div class="flex gap-sm items-center">
+                        <input type="email" id="admin-email-input" placeholder="yourname@gmail.com"
+                            class="flex-grow px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        <button onclick="saveAdminEmail()" class="h-11 px-lg bg-primary text-on-primary font-bold rounded-lg hover:bg-primary/90 active:scale-95 transition-all whitespace-nowrap flex items-center gap-xs">
+                            <span class="material-symbols-outlined" style="font-size:18px">save</span> Save Email
+                        </button>
+                    </div>
+                    <p class="text-body-sm text-[#2E8B57] font-semibold mt-xs hidden" id="admin-email-saved-msg">
+                        <span class="material-symbols-outlined align-middle" style="font-size:14px">check_circle</span> Email saved!
+                    </p>
+                </div>
+            </section>
+
+            <!-- ================= TAB: REPORTS ================= -->
+            <section id="tab-reports" class="tab-content space-y-md hidden">
+                <div>
+                    <h1 class="text-h2 font-h2 mb-xs">Reports & Performance</h1>
+                    <p class="text-body-sm text-on-surface-variant">Analyze order volumes, styles request rates, and log timing discipline.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                    <!-- Event date capacity -->
+                    <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                        <h3 class="text-h3 font-h3 mb-sm flex items-center gap-xs"><span class="material-symbols-outlined text-[#C0392B]">event</span> Upcoming Event Date Load</h3>
+                        <p class="text-body-sm text-on-surface-variant mb-md">Tracks tight print windows (events in next 10 days)</p>
+                        <div class="space-y-sm" id="report-events">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Payment log discipline metric -->
+                    <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                        <h3 class="text-h3 font-h3 mb-sm flex items-center gap-xs"><span class="material-symbols-outlined text-[#C98A1F]">speed</span> Staff Logging Discipline</h3>
+                        <p class="text-body-sm text-on-surface-variant mb-md">Average hours to log payment after booking submission</p>
+                        <div class="flex items-center gap-md">
+                            <div class="w-24 h-24 rounded-full border-4 border-primary flex flex-col items-center justify-center">
+                                <span class="text-h2 font-h2 text-primary" id="report-log-hours">4.2</span>
+                                <span class="text-[9px] font-bold text-outline uppercase">Hours</span>
+                            </div>
+                            <div class="flex-grow space-y-1">
+                                <p class="text-body-sm font-semibold">Performance Zone: <span class="text-success font-bold">Excellent</span></p>
+                                <p class="text-body-sm text-on-surface-variant">Log rates of less than 24 hours protect you against booking discrepancies and cash leakage.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- volume metrics -->
+                    <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                        <h3 class="text-h3 font-h3 mb-md flex items-center gap-xs"><span class="material-symbols-outlined text-primary">pie_chart</span> Popular Categories & Designs</h3>
+                        <div class="space-y-sm" id="report-styles">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- volume metrics -->
+                    <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                        <h3 class="text-h3 font-h3 mb-md flex items-center gap-xs"><span class="material-symbols-outlined text-[#2E8B57]">local_shipping</span> Volume Per Printer</h3>
+                        <div class="space-y-sm" id="report-printers-volume">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Detail Booking Overlay Modal -->
+    <div id="booking-detail-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-sm overflow-y-auto">
+        <div class="bg-surface-container-lowest rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto card-shadow flex flex-col border border-outline-variant/20">
+            <div class="p-md border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low/50">
+                <h3 class="text-h3 font-h3" id="modal-title">Booking Details</h3>
+                <div class="flex items-center gap-sm">
+                    <button onclick="sendBookingEmail(selectedBookingId)" title="Email booking summary to client + admin"
+                        class="flex items-center gap-xs px-sm py-1.5 bg-primary/10 text-primary font-bold rounded-lg text-body-sm hover:bg-primary/20 transition-all">
+                        <span class="material-symbols-outlined" style="font-size:16px">mail</span>
+                        Email Summary
+                    </button>
+                    <button onclick="closeBookingModal()" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+                </div>
+            </div>
+            
+            <div class="p-md space-y-md" id="modal-content">
+                <!-- Dynamic Content goes here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Printer/Catalog -->
+    <div id="item-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-sm">
+        <div class="bg-surface-container-lowest rounded-xl max-w-md w-full card-shadow p-md border border-outline-variant/20 space-y-md">
+            <div class="flex justify-between items-center border-b border-outline-variant/20 pb-sm">
+                <h3 class="text-h3 font-h3" id="item-modal-title">Add Item</h3>
+                <button onclick="closeItemModal()" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="item-modal-form-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check Admin Auth
+        const auth = JRData.requireAuth();
+        if (auth) {
+            document.getElementById('admin-user-name').textContent = auth.name;
+            document.getElementById('admin-user-role').textContent = auth.role === 'admin' ? 'Administrator' : 'Staff Member';
+        }
+
+        // Active State Tab tracking
+        let currentTab = 'bookings';
+        let selectedBookingId = null;
+
+        // Init admin email config
+        document.getElementById('admin-email-input').value = JRData.getAdminEmail();
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('mobile-menu-icon');
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                icon.textContent = 'menu';
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                icon.textContent = 'close';
+            }
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white/10', 'font-bold');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('bg-white/10', 'font-bold');
+
+            // Close mobile menu if open
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.add('-translate-x-full');
+            document.getElementById('mobile-menu-icon').textContent = 'menu';
+
+            // Custom renders
+            if (tabId === 'bookings') {
+                renderBookingsQueue();
+            } else if (tabId === 'printers') {
+                renderPrinters();
+            } else if (tabId === 'catalog') {
+                renderCatalog();
+            } else if (tabId === 'users') {
+                renderStaffList();
+            } else if (tabId === 'reports') {
+                renderReports();
+            }
+        }
+
+        // --- RENDER BOOKINGS QUEUE ---
+        function renderBookingsQueue() {
+            const search = document.getElementById('booking-search').value.toLowerCase();
+            const filter = document.getElementById('booking-filter').value;
+            const bookings = JRData.getBookings();
+
+            // Run stats first
+            const unloggedCount = bookings.filter(b => b.dataConfirmed && !b.paymentLog).length;
+            document.getElementById('stat-total').textContent = bookings.length;
+            document.getElementById('stat-pending').textContent = bookings.filter(b => b.status === 'submitted').length;
+            document.getElementById('stat-completed').textContent = bookings.filter(b => b.status === 'delivered').length;
+            document.getElementById('stat-unlogged').textContent = unloggedCount;
+
+            // Persistent Banner Toggle
+            const banner = document.getElementById('unlogged-payments-banner');
+            if (unloggedCount > 0) {
+                banner.classList.remove('hidden');
+                document.getElementById('unlogged-banner-text').textContent = `Bookings confirmed but payment not logged (${unloggedCount}, oldest pending payment logic required).`;
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            // Filter logic
+            let filtered = bookings.filter(b => {
+                const matchesSearch = b.id.toLowerCase().includes(search) || 
+                                      (b.names && b.names.toLowerCase().includes(search)) || 
+                                      (b.phone && b.phone.includes(search));
+                return matchesSearch;
+            });
+
+            if (filter === 'pending_confirmation') {
+                filtered = filtered.filter(b => !b.dataConfirmed);
+            } else if (filter === 'unlogged_payments') {
+                filtered = filtered.filter(b => b.dataConfirmed && !b.paymentLog);
+            } else if (filter === 'proof_approval') {
+                filtered = filtered.filter(b => b.status === 'proof_sent' || b.status === 'proof_approved');
+            } else if (filter === 'in_production') {
+                filtered = filtered.filter(b => b.status === 'in_print' || b.status === 'ready');
+            } else if (filter === 'delivered') {
+                filtered = filtered.filter(b => b.status === 'delivered');
+            }
+
+            // Sort event date ascending, push empty ones to bottom
+            filtered.sort((a,b) => {
+                if (!a.eventDate) return 1;
+                if (!b.eventDate) return -1;
+                return new Date(a.eventDate) - new Date(b.eventDate);
+            });
+
+            const tbody = document.getElementById('bookings-tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-lg text-center text-on-surface-variant/60">No bookings matching filter criteria found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(b => {
+                const isUrgent = b.eventDate && daysUntil(b.eventDate) !== null && daysUntil(b.eventDate) <= 7 && b.status !== 'delivered' && b.status !== 'cancelled';
+                const hasPayment = b.paymentLog ? `<span class="text-success font-semibold text-body-sm">Logged: ${formatCurrency(b.paymentLog.advanceAmount)}</span>` : `<span class="text-[#C0392B] font-bold text-body-sm flex items-center gap-xs"><span class="material-symbols-outlined" style="font-size:16px">warning</span> Unlogged</span>`;
+                
+                return `
+                <tr class="border-b border-outline-variant/15 hover:bg-surface-container-low/30 transition-all">
+                    <td class="p-md">
+                        <p class="font-bold text-primary cursor-pointer hover:underline" onclick="openBookingDetail('${b.id}')">${b.id}</p>
+                        <p class="text-[11px] text-on-surface-variant">${b.designName || 'Wedding Design'}</p>
+                    </td>
+                    <td class="p-md">
+                        <p class="font-semibold text-body-sm">${b.names || 'Anonymous'}</p>
+                        <p class="text-body-sm text-outline">${b.phone || '—'}</p>
+                    </td>
+                    <td class="p-md">
+                        <div class="flex items-center gap-xs">
+                            <span class="text-body-sm">${b.eventDate ? formatDate(b.eventDate) : '—'}</span>
+                            ${isUrgent ? `<span class="bg-[#C0392B] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-bounce">URGENT</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="p-md">${getStatusBadgeHTML(b.status)}</td>
+                    <td class="p-md">${hasPayment}</td>
+                    <td class="p-md">
+                        <button onclick="openBookingDetail('${b.id}')" class="px-3 py-1.5 bg-primary/10 text-primary font-bold text-label-caps rounded-lg hover:bg-primary hover:text-on-primary transition-all">Manage</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // --- OPEN BOOKING DETAILS overlay/modal ---
+        function openBookingDetail(id) {
+            selectedBookingId = id;
+            const b = JRData.getBookingById(id);
+            if (!b) return;
+
+            const modal = document.getElementById('booking-detail-modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+
+            title.textContent = `Order Details: ${b.id}`;
+            modal.classList.remove('hidden');
+
+            const printers = JRData.getPrinters();
+            const staffList = JRData.getStaff();
+
+            const prListHTML = printers.map(p => `<option value="${p.id}" ${b.printerAssigned === p.id ? 'selected' : ''}>${p.name} (${p.specialty})</option>`).join('');
+            const stListHTML = staffList.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+            // Data confirmation hard gate checkbox logic
+            const confirmCheckboxDisabled = b.dataConfirmed ? 'disabled checked' : '';
+            const confirmCheckboxText = b.dataConfirmed ? 'Confirmed' : 'Log Confirmation Reply from WhatsApp (Enables Pricing & Status)';
+
+            // Build pricing section based on confirmation gate status
+            let pricingSectionHTML = '';
+            if (!b.dataConfirmed) {
+                pricingSectionHTML = `
+                <div class="bg-surface-container-high/50 p-md rounded-xl border border-outline-variant/30 text-center">
+                    <span class="material-symbols-outlined text-[#C98A1F] text-4xl mb-xs">lock</span>
+                    <p class="font-bold text-[#C98A1F]">Pricing & Log Locked</p>
+                    <p class="text-body-sm text-on-surface-variant max-w-md mx-auto mt-xs">You must confirm the data correctness with the client on WhatsApp and check the WhatsApp Confirmation box above before you can input details into the Pricing and Payment logs.</p>
+                </div>`;
+            } else {
+                pricingSectionHTML = `
+                <form onsubmit="handleLogPayment(event)" class="space-y-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-sm">
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Final Agreed Price</label>
+                            <input type="number" id="pay-final" required value="${b.paymentLog ? b.paymentLog.finalPrice : ''}" class="w-full h-10 px-sm border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Original Estimate</label>
+                            <input type="number" id="pay-original" value="${b.paymentLog ? (b.paymentLog.originalPrice || '') : ''}" placeholder="Optional" class="w-full h-10 px-sm border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Advance Amount</label>
+                            <input type="number" id="pay-advance" required value="${b.paymentLog ? b.paymentLog.advanceAmount : ''}" class="w-full h-10 px-sm border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Payment Method</label>
+                            <select id="pay-method" class="w-full h-10 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                                <option value="UPI" ${b.paymentLog && b.paymentLog.method === 'UPI' ? 'selected' : ''}>UPI / Net Banking</option>
+                                <option value="Cash" ${b.paymentLog && b.paymentLog.method === 'Cash' ? 'selected' : ''}>Cash / Off-Platform</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">UPI Ref / Cash Note</label>
+                            <input type="text" id="pay-reference" required value="${b.paymentLog ? b.paymentLog.reference : ''}" placeholder="e.g. UPI Ref# or 'Received Cash'" class="w-full h-10 px-sm border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                        <div>
+                            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Logged By</label>
+                            <select id="pay-loggedby" class="w-full h-10 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                                ${stListHTML}
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full h-10 bg-primary text-on-primary font-bold text-label-caps tracking-wider rounded-lg shadow hover:bg-primary/95 transition-all">Save Pricing & Payment Log</button>
+                        </div>
+                    </div>
+                </form>`;
+            }
+
+            // Build Proofing section
+            let proofingHTML = '';
+            if (!b.dataConfirmed) {
+                proofingHTML = `<p class="text-body-sm text-outline italic">Unavailable until details are WhatsApp-confirmed.</p>`;
+            } else {
+                proofingHTML = `
+                <div class="space-y-sm">
+                    <p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider mb-xs">Image URL or Google Drive Share Link</p>
+                    <div class="flex gap-sm items-center">
+                        <input type="text" id="proof-url-input" placeholder="Paste URL or Google Drive share link..." value="${b.proofUrl || ''}"
+                            class="flex-grow h-10 px-sm border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                        <button onclick="handleUploadProof()" class="h-10 px-sm bg-primary text-on-primary font-bold rounded-lg text-body-sm hover:opacity-95 shadow whitespace-nowrap">Update Proof</button>
+                    </div>
+                    ${b.proofUrl ? `
+                    <div class="p-sm bg-surface-container-low rounded-lg border border-outline-variant/30 flex items-center justify-between">
+                        <span class="text-body-sm text-success font-semibold flex items-center gap-xs"><span class="material-symbols-outlined">check</span> Proof URL Set</span>
+                        <a href="${b.proofUrl}" target="_blank" class="text-primary text-body-sm underline font-semibold">Open proof in new window</a>
+                    </div>` : ''}
+                </div>`;
+            }
+
+            content.innerHTML = `
+            <!-- Client Info Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm bg-surface-container-low/40 p-sm rounded-xl border border-outline-variant/15">
+                <div>
+                    <h4 class="text-body-sm font-bold border-b border-outline-variant/10 pb-xs mb-xs">Customer Order info</h4>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Design:</span> ${b.designName || '—'}</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Quantity:</span> ${b.quantity} pcs</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Names:</span> ${b.names || '—'}</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Event:</span> ${b.eventDate ? formatDateTime(b.eventDate) : '—'}</p>
+                </div>
+                <div>
+                    <h4 class="text-body-sm font-bold border-b border-outline-variant/10 pb-xs mb-xs">Delivery & Contact</h4>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Phone:</span> ${b.phone || '—'}</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Email:</span> ${b.email || '—'}</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">Address:</span> ${b.venue || '—'}</p>
+                    <p class="text-body-sm text-on-surface-variant"><span class="font-semibold text-on-surface">City/Pincode:</span> ${b.city || '—'} - ${b.pincode || '—'}</p>
+                </div>
+            </div>
+
+            <!-- Gate validation -->
+            <div class="bg-surface-container-lowest p-sm border border-outline-variant/20 rounded-xl">
+                <label class="flex items-center gap-sm cursor-pointer p-xs hover:bg-surface-container-low/40 rounded-lg">
+                    <input type="checkbox" id="gate-checkbox" ${confirmCheckboxDisabled} onchange="handleConfirmGate(this)"
+                        class="w-5 h-5 text-primary border-outline-variant focus:ring-primary rounded">
+                    <span class="text-body-sm font-semibold text-on-surface-variant">${confirmCheckboxText}</span>
+                </label>
+            </div>
+
+            <!-- Workflow Status dropdown -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                    <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Order Status</label>
+                    <select id="update-status" onchange="handleStatusChange(this.value)" ${!b.dataConfirmed ? 'disabled' : ''}
+                        class="w-full h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        <option value="submitted" ${b.status === 'submitted' ? 'selected' : ''}>Submitted</option>
+                        <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Details Confirmed</option>
+                        <option value="advance_received" ${b.status === 'advance_received' ? 'selected' : ''}>Advance Received</option>
+                        <option value="assigned" ${b.status === 'assigned' ? 'selected' : ''}>Assigned to Printer</option>
+                        <option value="proof_sent" ${b.status === 'proof_sent' ? 'selected' : ''}>Proof Sent</option>
+                        <option value="proof_approved" ${b.status === 'proof_approved' ? 'selected' : ''}>Proof Approved</option>
+                        <option value="price_change_pending" ${b.status === 'price_change_pending' ? 'selected' : ''}>Price Change Pending</option>
+                        <option value="in_print" ${b.status === 'in_print' ? 'selected' : ''}>In Print</option>
+                        <option value="ready" ${b.status === 'ready' ? 'selected' : ''}>Ready for pickup/delivery</option>
+                        <option value="delivered" ${b.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Assign Print Shop (Internal Only)</label>
+                    <select id="assign-printer" onchange="handleAssignPrinter(this.value)" ${!b.dataConfirmed ? 'disabled' : ''}
+                        class="w-full h-11 border border-outline-variant rounded-lg text-body-sm focus:ring-1 focus:ring-primary focus:outline-none">
+                        <option value="">Choose Specialty Printer...</option>
+                        ${prListHTML}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Pricing log section -->
+            <div class="border border-outline-variant/20 rounded-xl p-md">
+                <h4 class="text-body-sm font-bold mb-sm flex items-center gap-xs"><span class="material-symbols-outlined text-primary" style="font-size:18px">payments</span> Pricing &amp; Payment Log</h4>
+                ${pricingSectionHTML}
+            </div>
+
+            <!-- Proof Upload Section -->
+            <div class="border border-outline-variant/20 rounded-xl p-md">
+                <h4 class="text-body-sm font-bold mb-sm flex items-center gap-xs"><span class="material-symbols-outlined text-primary" style="font-size:18px">preview</span> Upload Proof Details</h4>
+                ${proofingHTML}
+            </div>
+            `;
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-detail-modal').classList.add('hidden');
+            renderBookingsQueue();
+        }
+
+        // --- SUBMIT COMPONENT EVENT HANDLERS ---
+        function handleConfirmGate(cb) {
+            if (cb.checked) {
+                JRData.updateBooking(selectedBookingId, { dataConfirmed: true });
+                JRData.updateBookingStatus(selectedBookingId, 'confirmed', 'Admin logged client confirmed details from WhatsApp');
+                openBookingDetail(selectedBookingId);
+            }
+        }
+
+        function handleStatusChange(newStatus) {
+            JRData.updateBookingStatus(selectedBookingId, newStatus, `Status updated to ${newStatus} by admin`);
+            openBookingDetail(selectedBookingId);
+        }
+
+        function handleAssignPrinter(printerId) {
+            JRData.updateBooking(selectedBookingId, { printerAssigned: printerId });
+            const p = JRData.getPrinters().find(pr => pr.id === printerId);
+            JRData.updateBookingStatus(selectedBookingId, 'assigned', `Assigned to printer: ${p ? p.name : 'None'}`);
+        }
+
+        function handleLogPayment(e) {
+            e.preventDefault();
+            const finalPrice = parseFloat(document.getElementById('pay-final').value);
+            const originalPrice = parseFloat(document.getElementById('pay-original').value) || finalPrice;
+            const advanceAmount = parseFloat(document.getElementById('pay-advance').value);
+            const method = document.getElementById('pay-method').value;
+            const reference = document.getElementById('pay-reference').value;
+            const loggedBy = document.getElementById('pay-loggedby').value;
+
+            // Trigger 20% price notice rules if required
+            const b = JRData.getBookingById(selectedBookingId);
+            let nextStatus = 'advance_received';
+            let changeNoticeTriggered = false;
+
+            const pctIncrease = ((finalPrice - originalPrice) / originalPrice) * 100;
+            if (pctIncrease >= 20) {
+                nextStatus = 'price_change_pending';
+                changeNoticeTriggered = true;
+            }
+
+            const paymentLog = { finalPrice, originalPrice, advanceAmount, method, reference, dateReceived: new Date().toISOString().split('T')[0], loggedBy };
+            JRData.updateBooking(selectedBookingId, { paymentLog });
+            JRData.updateBookingStatus(selectedBookingId, nextStatus, `Advance payment logged by ${loggedBy}. Reference: ${reference}. ${changeNoticeTriggered ? '(Price increase >= 20% triggered Price Change Pending gate)' : ''}`, loggedBy);
+
+            alert(changeNoticeTriggered ? 'Price variance exceeds 20%. order status updated to Price Change Pending.' : 'Payment logged successfully. Notification message copied.');
+            
+            // Auto copy whatsapp notification alert template
+            const bal = finalPrice - advanceAmount;
+            const notificationTxt = `Thank you — we've received your advance of ₹${advanceAmount.toLocaleString('en-IN')} for Booking #${b.id} on ${new Date().toLocaleDateString('en-IN')}. Please note: advances are non-refundable once received. Balance due: ₹${bal.toLocaleString('en-IN')} on delivery. Logged by: ${loggedBy}`;
+            navigator.clipboard.writeText(notificationTxt).catch(err => console.warn('Clipboard write failed:', err));
+
+            openBookingDetail(selectedBookingId);
+        }
+
+        function handleUploadProof() {
+            const rawUrl = document.getElementById('proof-url-input').value.trim();
+            if (!rawUrl) return;
+            const url = convertGDriveUrl(rawUrl);
+            JRData.updateBooking(selectedBookingId, { proofUrl: url });
+            JRData.updateBookingStatus(selectedBookingId, 'proof_sent', 'Admin uploaded proof details');
+            openBookingDetail(selectedBookingId);
+            alert('Proof image reference set successfully!');
+        }
+
+        // --- TAB: PRINTERS DIRECTORY RENDER ---
+        function renderPrinters() {
+            const printers = JRData.getPrinters();
+            const grid = document.getElementById('printers-grid');
+            grid.innerHTML = printers.map(p => `
+            <div class="bg-surface-container-lowest border border-outline-variant/30 p-md rounded-xl card-shadow flex flex-col justify-between">
+                <div class="space-y-xs">
+                    <div class="flex justify-between items-start">
+                        <span class="text-label-caps font-label-caps text-outline uppercase">${p.id}</span>
+                        <button onclick="deletePrinter('${p.id}')" class="text-outline hover:text-[#C0392B]"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button>
+                    </div>
+                    <h3 class="text-body-lg font-bold">${p.name}</h3>
+                    <p class="text-body-sm text-primary font-semibold flex items-center gap-xs"><span class="material-symbols-outlined" style="font-size:16px">badge</span> ${p.specialty}</p>
+                    <p class="text-body-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined" style="font-size:16px">phone</span> ${p.phone}</p>
+                    <p class="text-body-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined" style="font-size:16px">schedule</span> turnaround: ${p.turnaround}</p>
+                    <p class="text-body-sm text-outline italic pt-xs border-t border-outline-variant/10">${p.notes || 'No notes'}</p>
+                </div>
+            </div>`).join('');
+        }
+
+        function openPrinterModal() {
+            const modal = document.getElementById('item-modal');
+            document.getElementById('item-modal-title').textContent = 'Add Specialty Printer';
+            modal.classList.remove('hidden');
+
+            document.getElementById('item-modal-form-container').innerHTML = `
+            <form onsubmit="handleSavePrinter(event)" class="space-y-sm">
+                <div>
+                    <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Printer Shop Name</label>
+                    <input type="text" id="pr-name" required class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Specialty Category</label>
+                    <input type="text" id="pr-specialty" required placeholder="e.g. Wedding Cards, Digital" class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Phone Number</label>
+                    <input type="tel" id="pr-phone" required class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Typical Turnaround</label>
+                    <input type="text" id="pr-turnaround" placeholder="e.g. 5-7 days" class="w-full px-sm h-11 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Private Notes</label>
+                    <textarea id="pr-notes" rows="2" class="w-full p-sm border border-outline-variant rounded-lg text-body-sm focus:outline-none resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full h-11 bg-primary text-on-primary font-bold rounded-lg shadow">Save Printer</button>
+            </form>`;
+        }
+
+        function handleSavePrinter(e) {
+            e.preventDefault();
+            const name = document.getElementById('pr-name').value;
+            const specialty = document.getElementById('pr-specialty').value;
+            const phone = document.getElementById('pr-phone').value;
+            const turnaround = document.getElementById('pr-turnaround').value || '3-5 days';
+            const notes = document.getElementById('pr-notes').value;
+
+            const printers = JRData.getPrinters();
+            const id = 'P00' + (printers.length + 1);
+            printers.push({ id, name, specialty, phone, turnaround, notes });
+            JRData.savePrinters(printers);
+
+            closeItemModal();
+            renderPrinters();
+        }
+
+        function deletePrinter(id) {
+            if (!confirm('Are you sure you want to delete this printer?')) return;
+            const printers = JRData.getPrinters().filter(p => p.id !== id);
+            JRData.savePrinters(printers);
+            renderPrinters();
+        }
+
+        // --- TAB: CATALOG MANAGER ---
+        function renderCatalog() {
+            const catalog = JRData.getCatalog();
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = catalog.map(d => `
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow overflow-hidden flex flex-col justify-between">
+                <div class="relative h-40 bg-surface-container-high">
+                    <img src="${d.image}" alt="${d.name_en}" class="w-full h-full object-cover">
+                    <span class="absolute top-2 right-2 bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase backdrop-blur-sm">${d.category}</span>
+                </div>
+                <div class="p-sm flex-grow flex flex-col justify-between gap-sm">
+                    <div class="space-y-xs">
+                        <h4 class="font-bold text-body-md">${d.name_en}</h4>
+                        <p class="text-hindi-body font-hindi text-body-sm">${d.name_hi || ''}</p>
+                        <div class="flex flex-wrap gap-xs pt-xs">
+                            <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full">${d.gsm} GSM</span>
+                            <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full">${d.finish}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-outline-variant/10 pt-sm">
+                        <span class="text-body-sm text-on-surface-variant font-medium">Min: ${d.minQty || 100} pcs</span>
+                        <button onclick="deleteCatalogItem('${d.id}')" class="text-outline hover:text-[#C0392B]"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button>
+                    </div>
+                </div>
+            </div>`).join('');
+        }
+
+        function openDesignModal() {
+            const modal = document.getElementById('item-modal');
+            document.getElementById('item-modal-title').textContent = 'Add Design Template';
+            modal.classList.remove('hidden');
+
+            document.getElementById('item-modal-form-container').innerHTML = `
+            <form onsubmit="handleSaveDesign(event)" class="space-y-xs">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase mb-0.5">Design Name (English)</label>
+                    <input type="text" id="de-name-en" required class="w-full px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase mb-0.5">Design Name (Hindi)</label>
+                    <input type="text" id="de-name-hi" class="w-full px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase mb-0.5">Category</label>
+                    <select id="de-category" class="w-full h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                        <option value="Wedding Cards">Wedding Cards</option>
+                        <option value="Visiting Cards">Visiting Cards</option>
+                        <option value="Invitation Cards">Invitation Cards</option>
+                        <option value="Posters/Banners">Posters/Banners</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-sm">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase mb-0.5">Paper / Finish</label>
+                        <input type="text" id="de-finish" placeholder="e.g. Silk Texture" class="w-full px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase mb-0.5">GSM / Thickness</label>
+                        <input type="number" id="de-gsm" placeholder="300" class="w-full px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-sm">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase mb-0.5">Min Order</label>
+                        <input type="number" id="de-min" placeholder="100" class="w-full px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                    </div>
+                <div class="col-span-2">
+                        <label class="block text-[11px] font-bold uppercase mb-0.5">Image URL or Google Drive Share Link</label>
+                        <div class="flex gap-xs">
+                            <input type="text" id="de-image" placeholder="Paste URL or Google Drive share link" class="flex-grow px-sm h-9 border border-outline-variant rounded-lg text-body-sm focus:outline-none">
+                            <button type="button" onclick="previewDesignImage()" class="h-9 px-sm bg-primary/10 text-primary font-bold rounded-lg text-body-sm hover:bg-primary/20 whitespace-nowrap">Preview</button>
+                        </div>
+                        <div id="de-image-preview" class="hidden mt-xs rounded-lg overflow-hidden border border-outline-variant/30 h-32">
+                            <img id="de-image-preview-img" src="" class="w-full h-full object-cover" alt="Preview">
+                        </div>
+                        <p class="text-[10px] text-on-surface-variant mt-1">Supports Google Drive, Dropbox, and direct image URLs. Google Drive: Share → Copy link → Paste here.</p>
+                    </div>
+                </div>
+                <button type="submit" class="w-full h-11 bg-primary text-on-primary font-bold rounded-lg shadow mt-sm">Save Product</button>
+            </form>`;
+        }
+
+        function handleSaveDesign(e) {
+            e.preventDefault();
+            const name_en = document.getElementById('de-name-en').value;
+            const name_hi = document.getElementById('de-name-hi').value;
+            const category = document.getElementById('de-category').value;
+            const finish = document.getElementById('de-finish').value || 'Velvet Matte';
+            const gsm = parseInt(document.getElementById('de-gsm').value) || 300;
+            const minQty = parseInt(document.getElementById('de-min').value) || 100;
+            const imageRaw = document.getElementById('de-image').value;
+            const image = convertGDriveUrl(imageRaw) || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDy1k1XY0aI5quURrskNaueZvV-RAwhTSkv8G-JSpmi1zYkvombJE9lmBoMcnhYpqxyBtOcChYQL5puWjoxI1SmZyPgA8Egt70aLPxJhoXG2-jvCK1wQozB1GQE6PHh67JGfvhopeT7c4U32bYE9zXA-cvKBHVSirmDMuGse9QBTi62Td6SfJT1ybjvtPxGlDM64IveaARxbR2Fp17SnOhoFkBO3-udvLB-B0tdV__ucnnS2R4uQHH8HcZKhYGr7NORf5uH69LRUn0X';
+
+            const catalog = JRData.getCatalog();
+            const id = 'D00' + (catalog.length + 1);
+            catalog.push({ id, name_en, name_hi, category, finish, gsm, minQty, image });
+            JRData.saveCatalog(catalog);
+
+            closeItemModal();
+            renderCatalog();
+        }
+
+        function deleteCatalogItem(id) {
+            if (!confirm('Are you sure you want to delete this catalog item?')) return;
+            const catalog = JRData.getCatalog().filter(c => c.id !== id);
+            JRData.saveCatalog(catalog);
+            renderCatalog();
+        }
+
+        function previewDesignImage() {
+            const raw = document.getElementById('de-image').value;
+            const converted = convertGDriveUrl(raw);
+            if (!converted) return;
+            const preview = document.getElementById('de-image-preview');
+            const img = document.getElementById('de-image-preview-img');
+            img.src = converted;
+            preview.classList.remove('hidden');
+            img.onerror = () => {
+                preview.classList.add('hidden');
+                alert('Could not load image. Make sure the Google Drive file is shared as "Anyone with the link can view".');
+            };
+        }
+
+        function sendBookingEmail(bookingId) {
+            const b = JRData.getBookingById(bookingId);
+            if (!b) return;
+            const adminEmail = JRData.getAdminEmail();
+            const clientEmail = b.email || '';
+
+            const subject = encodeURIComponent(`JR Printiq Booking Confirmation — ${b.id}`);
+            const body = encodeURIComponent([
+                `Dear ${b.names || 'Valued Client'},`,
+                ``,
+                `Thank you for booking with JR Printiq! Here is a complete copy of your booking details:`,
+                ``,
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                `BOOKING ID   : ${b.id}`,
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                `Design       : ${b.designName || '—'}`,
+                `Names        : ${b.names || '—'}`,
+                `Event Date   : ${b.eventDate ? new Date(b.eventDate).toLocaleString('en-IN') : '—'}`,
+                `Venue        : ${b.venue || '—'}`,
+                `Language     : ${b.language || '—'}`,
+                `Quantity     : ${b.quantity || '—'} pcs`,
+                `City         : ${b.city || '—'} — ${b.pincode || ''}`,
+                `Preferred By : ${b.preferredDate || '—'}`,
+                `Phone        : +91 ${b.phone || '—'}`,
+                `Email        : ${b.email || '—'}`,
+                ``,
+                b.familyNames && b.familyNames.length > 0 ? `Host Names   : ${b.familyNames.join(', ')}` : '',
+                ``,
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                `STATUS: ${b.status ? b.status.replace(/_/g,' ').toUpperCase() : 'SUBMITTED'}`,
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                ``,
+                `IMPORTANT: Once an advance payment is received and confirmed, it is strictly non-refundable.`,
+                `Our team will contact you on WhatsApp (+91 73765 50040) to confirm final pricing and design details.`,
+                ``,
+                `Track your order at: ${window.location.origin}/order_tracking/index.html?id=${b.id}`,
+                ``,
+                `Warm regards,`,
+                `JR Printiq Team`,
+                `Alibuilding, Mau, 275101, Uttar Pradesh`,
+                `WhatsApp: +91 73765 50040`,
+            ].filter(l => l !== undefined).join('\n'));
+
+            // Build mailto: — if client has email, CC admin; if no client email, send only to admin
+            let mailto;
+            if (clientEmail && adminEmail) {
+                mailto = `mailto:${clientEmail}?cc=${encodeURIComponent(adminEmail)}&subject=${subject}&body=${body}`;
+            } else if (adminEmail) {
+                mailto = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+            } else if (clientEmail) {
+                mailto = `mailto:${clientEmail}?subject=${subject}&body=${body}`;
+            } else {
+                alert('No email addresses configured. Please add the client email in their booking and set your admin email in the Users tab.');
+                return;
+            }
+            window.open(mailto, '_blank');
+        }
+
+        // --- TAB: STAFF USERS ---
+        function renderStaffList() {
+            const staff = JRData.getStaff();
+            const container = document.getElementById('staff-list');
+            container.innerHTML = staff.map(s => `
+            <li class="p-sm flex justify-between items-center bg-surface-container-lowest hover:bg-surface-container-low/20">
+                <div class="flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-outline">account_circle</span>
+                    <div>
+                        <p class="text-body-sm font-semibold">${s.name}</p>
+                        <p class="text-[11px] text-outline">@${s.username} — ${s.role}</p>
+                    </div>
+                </div>
+                ${s.username !== 'admin' ? `<button onclick="deleteStaff('${s.username}')" class="text-[#C0392B] hover:bg-[#C0392B]/5 px-2 py-1 rounded text-body-sm font-bold">Remove</button>` : ''}
+            </li>`).join('');
+        }
+
+        function handleAddStaff(e) {
+            e.preventDefault();
+            const name = document.getElementById('staff-name').value;
+            const username = document.getElementById('staff-username').value.trim();
+            const password = document.getElementById('staff-password').value;
+            const role = document.getElementById('staff-role').value;
+
+            const staff = JRData.getStaff();
+            if (staff.find(s => s.username === username)) {
+                alert('Username already exists!');
+                return;
+            }
+
+            JRData.addStaff({ name, username, password, role });
+            document.getElementById('staff-name').value = '';
+            document.getElementById('staff-username').value = '';
+            document.getElementById('staff-password').value = '';
+            renderStaffList();
+        }
+
+        function deleteStaff(username) {
+            if (!confirm('Remove this staff account?')) return;
+            JRData.removeStaff(username);
+            renderStaffList();
+        }
+
+        function saveAdminEmail() {
+            const email = document.getElementById('admin-email-input').value.trim();
+            JRData.setAdminEmail(email);
+            const msg = document.getElementById('admin-email-saved-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+
+        // --- TAB: REPORTS & Performance ---
+        function renderReports() {
+            const bookings = JRData.getBookings();
+
+            // Load upcoming event dates
+            const urgentEvents = bookings.filter(b => b.eventDate && daysUntil(b.eventDate) !== null && daysUntil(b.eventDate) <= 10 && b.status !== 'delivered');
+            const reportEvents = document.getElementById('report-events');
+            if (urgentEvents.length === 0) {
+                reportEvents.innerHTML = `<p class="text-body-sm text-outline italic">No heavy print event windows in the next 10 days.</p>`;
+            } else {
+                reportEvents.innerHTML = urgentEvents.map(b => `
+                <div class="flex justify-between items-center p-sm bg-[#C0392B]/5 rounded-lg border border-[#C0392B]/10">
+                    <div>
+                        <p class="text-body-sm font-bold text-[#C0392B]">${b.id} — ${b.names}</p>
+                        <p class="text-[11px] text-on-surface-variant">Event date: ${formatDate(b.eventDate)}</p>
+                    </div>
+                    <span class="bg-[#C0392B] text-white font-bold text-[10px] px-2 py-0.5 rounded-full">${daysUntil(b.eventDate)} days left</span>
+                </div>`).join('');
+            }
+
+            // Category counts
+            const counts = {};
+            bookings.forEach(b => {
+                counts[b.designName] = (counts[b.designName] || 0) + 1;
+            });
+            const reportStyles = document.getElementById('report-styles');
+            const sortedStyles = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            if (sortedStyles.length === 0) {
+                reportStyles.innerHTML = '<p class="text-body-sm text-outline italic">No order stats yet.</p>';
+            } else {
+                reportStyles.innerHTML = sortedStyles.map(([name, count]) => `
+                <div class="flex items-center justify-between text-body-sm">
+                    <span class="truncate font-semibold">${name}</span>
+                    <span class="font-bold text-primary">${count} bookings</span>
+                </div>`).join('');
+            }
+
+            // Printer volumes
+            const printers = JRData.getPrinters();
+            const printerCounts = {};
+            bookings.forEach(b => {
+                if (b.printerAssigned) {
+                    printerCounts[b.printerAssigned] = (printerCounts[b.printerAssigned] || 0) + 1;
+                }
+            });
+            const pVol = document.getElementById('report-printers-volume');
+            pVol.innerHTML = printers.map(p => {
+                const count = printerCounts[p.id] || 0;
+                return `
+                <div class="flex justify-between items-center text-body-sm">
+                    <span>${p.name}</span>
+                    <span class="font-bold">${count} active orders</span>
+                </div>`;
+            }).join('');
+        }
+
+        // --- MODAL UTILITIES ---
+        function closeItemModal() {
+            document.getElementById('item-modal').classList.add('hidden');
+        }
+
+        function handleLogout() {
+            JRData.logout();
+            window.location.href = 'login.html';
+        }
+
+        // Run Initial Load
+        switchTab('bookings');
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JR Printiq | Booking Confirmed</title>
+    <meta name="description" content="Your booking has been submitted successfully. Track your order status with your Booking ID.">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="../shared/design-tokens.js"></script>
+    <script src="../shared/components.js"></script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F7F9FC; }
+        .success-ring { animation: ringPulse 2s ease-out infinite; }
+        @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(46,139,87,0.3); } 70% { box-shadow: 0 0 0 20px rgba(46,139,87,0); } 100% { box-shadow: 0 0 0 0 rgba(46,139,87,0); } }
+        .confetti-particle { position: fixed; pointer-events: none; z-index: 100; animation: confettiFall 3s ease-in forwards; }
+        @keyframes confettiFall { 0% { opacity: 1; transform: translateY(-20px) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
+        .card-shadow { box-shadow: 0 4px 12px rgba(11,47,107,0.05); }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen">
+    <div id="header-mount"></div>
+
+    <main class="pt-24 pb-xl max-w-max_width mx-auto px-gutter">
+        <div class="max-w-2xl mx-auto text-center">
+            <!-- Success Animation -->
+            <div class="mb-lg">
+                <div class="w-24 h-24 mx-auto bg-[#2E8B57] rounded-full flex items-center justify-center success-ring mb-md">
+                    <span class="material-symbols-outlined text-white" style="font-size:48px;font-variation-settings:'FILL' 1">check_circle</span>
+                </div>
+                <h1 class="text-h1-mobile md:text-h1 font-h1 text-on-surface mb-base">Booking Submitted!</h1>
+                <p class="text-body-lg text-on-surface-variant" data-en="Your booking has been received. Our team will contact you shortly." data-hi="आपकी बुकिंग प्राप्त हो गई है। हमारी टीम शीघ्र ही आपसे संपर्क करेगी।">Your booking has been received. Our team will contact you shortly.</p>
+            </div>
+
+            <!-- Booking ID Card -->
+            <div class="bg-surface-container-lowest border-2 border-[#2E8B57] rounded-xl p-lg card-shadow mb-lg">
+                <p class="text-label-caps font-label-caps text-[#2E8B57] uppercase tracking-widest mb-xs">Your Booking ID</p>
+                <div class="flex items-center justify-center gap-sm mb-md">
+                    <span class="text-h1 font-h1 text-on-surface tracking-wider" id="booking-id-display">JR-XXXXXX</span>
+                    <button onclick="copyBookingId()" class="p-2 hover:bg-surface-container-high rounded-lg transition-all" title="Copy Booking ID">
+                        <span class="material-symbols-outlined text-primary">content_copy</span>
+                    </button>
+                </div>
+                <p class="text-body-sm text-on-surface-variant">Save this ID to track your order anytime</p>
+                <div id="copy-toast" class="hidden mt-2 text-body-sm text-[#2E8B57] font-bold">✓ Copied to clipboard!</div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="bg-[#C98A1F]/10 border border-[#C98A1F]/20 rounded-xl p-md mb-lg flex items-center gap-md">
+                <div class="w-12 h-12 bg-[#C98A1F]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[#C98A1F]">hourglass_top</span>
+                </div>
+                <div class="text-left">
+                    <p class="font-bold text-[#C98A1F]" data-en="Status: Submitted — Awaiting Confirmation" data-hi="स्थिति: जमा — पुष्टि की प्रतीक्षा">Status: Submitted — Awaiting Confirmation</p>
+                    <p class="text-body-sm text-on-surface-variant" data-en="Our team will contact you on WhatsApp/call shortly to confirm final pricing and details." data-hi="हमारी टीम अंतिम मूल्य और विवरण की पुष्टि के लिए शीघ्र ही व्हाट्सएप/कॉल पर आपसे संपर्क करेगी।">Our team will contact you on WhatsApp/call shortly to confirm final pricing and details.</p>
+                </div>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow mb-lg text-left">
+                <div class="p-md border-b border-outline-variant/20">
+                    <h2 class="text-h3 font-h3 flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary">receipt_long</span>
+                        Booking Summary
+                    </h2>
+                </div>
+                <div class="p-md space-y-sm" id="booking-summary">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Non-Refundable Notice -->
+            <div class="bg-[#C0392B]/5 border border-[#C0392B]/20 rounded-xl p-md mb-lg flex items-start gap-sm text-left">
+                <span class="material-symbols-outlined text-[#C0392B] flex-shrink-0 mt-0.5">info</span>
+                <div>
+                    <p class="font-bold text-[#C0392B] text-body-sm" data-en="Important: Advance Payment Policy" data-hi="महत्वपूर्ण: अग्रिम भुगतान नीति">Important: Advance Payment Policy</p>
+                    <p class="text-body-sm text-on-surface-variant" data-en="Once an advance payment is received and confirmed, it is non-refundable. Full terms are available on our Terms & Policy page." data-hi="एक बार अग्रिम भुगतान प्राप्त और पुष्टि होने के बाद, यह वापसी योग्य नहीं है।">Once an advance payment is received and confirmed, it is non-refundable. Full terms are available on our <a href="../terms/index.html" class="text-primary underline">Terms & Policy page</a>.</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-sm justify-center">
+                <a href="../order_tracking/index.html" class="inline-flex items-center justify-center gap-sm bg-primary text-on-primary font-bold px-lg py-4 rounded-brand hover:bg-primary/90 transition-all active:scale-95 shadow-md">
+                    <span class="material-symbols-outlined">location_searching</span>
+                    Track Your Order
+                </a>
+                <a id="whatsapp-share-btn" href="#" target="_blank" class="inline-flex items-center justify-center gap-sm bg-[#25D366] text-white font-bold px-lg py-4 rounded-brand hover:bg-[#25D366]/90 transition-all active:scale-95 shadow-md">
+                    <svg fill="currentColor" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.305 1.652zm6.599-3.835c1.522.902 3.271 1.379 5.063 1.38h.005c5.448 0 9.882-4.433 9.885-9.88.001-2.641-1.03-5.123-2.903-6.997s-4.355-2.905-6.998-2.905c-5.443 0-9.876 4.433-9.879 9.879-.001 1.892.536 3.733 1.554 5.337l-1.023 3.73 3.826-1.004zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    Share via WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-mount"></div>
+    <div id="fab-mount"></div>
+
+    <script>
+        // Mount shared components
+        document.getElementById('header-mount').innerHTML = renderHeader('', '../');
+        document.getElementById('footer-mount').innerHTML = renderFooter('../');
+        document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+        // Get booking data from URL or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
+        const booking = bookingId ? JRData.getBookingById(bookingId) : null;
+
+        if (booking) {
+            document.getElementById('booking-id-display').textContent = booking.id;
+            document.title = `JR Printiq | Booking ${booking.id} Confirmed`;
+
+            // WhatsApp share
+            const shareMsg = encodeURIComponent(`My JR Printiq Booking ID: ${booking.id}\nDesign: ${booking.designName}\nQuantity: ${booking.quantity}`);
+            document.getElementById('whatsapp-share-btn').href = `https://wa.me/?text=${shareMsg}`;
+
+            // Build summary
+            const summaryHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Design Selected</span>
+                        <span class="font-semibold">${booking.designName || '—'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Names</span>
+                        <span class="font-semibold">${booking.names || '—'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Event Date</span>
+                        <span class="font-semibold">${booking.eventDate ? formatDateTime(booking.eventDate) : 'Not specified'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Venue</span>
+                        <span class="font-semibold">${booking.venue || 'Not specified'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Language</span>
+                        <span class="font-semibold">${booking.language || '—'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Quantity</span>
+                        <span class="font-semibold">${booking.quantity || '—'} pcs</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Delivery City</span>
+                        <span class="font-semibold">${booking.city || '—'} ${booking.pincode ? '- ' + booking.pincode : ''}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Preferred Delivery</span>
+                        <span class="font-semibold">${booking.preferredDate ? formatDate(booking.preferredDate) : 'Not specified'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Contact Phone</span>
+                        <span class="font-semibold">${booking.phone || '—'}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Email</span>
+                        <span class="font-semibold">${booking.email || 'Not provided'}</span>
+                    </div>
+                </div>
+                ${booking.familyNames && booking.familyNames.length > 0 ? `
+                <div class="border-t border-outline-variant/20 pt-sm mt-sm">
+                    <span class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase">Host / Family Names</span>
+                    <ul class="mt-xs space-y-1">${booking.familyNames.map(n => `<li class="font-semibold">• ${n}</li>`).join('')}</ul>
+                </div>` : ''}
+            `;
+            document.getElementById('booking-summary').innerHTML = summaryHTML;
+        } else {
+            // No booking found - show a generic message
+            document.getElementById('booking-id-display').textContent = 'Not Found';
+            document.getElementById('booking-summary').innerHTML = '<p class="text-on-surface-variant text-center py-lg">No booking data found. Please submit a booking first.</p>';
+        }
+
+        // Confetti
+        function launchConfetti() {
+            const colors = ['#1E56C8','#2E8B57','#C9A24B','#3B7DE8','#C98A1F'];
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti-particle';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.top = -10 + 'px';
+                el.style.width = (Math.random()*8+4) + 'px';
+                el.style.height = (Math.random()*8+4) + 'px';
+                el.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                el.style.animationDelay = (Math.random()*2) + 's';
+                el.style.animationDuration = (Math.random()*2+2) + 's';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
+            }
+        }
+        setTimeout(launchConfetti, 300);
+
+        function copyBookingId() {
+            const id = document.getElementById('booking-id-display').textContent;
+            navigator.clipboard.writeText(id).then(() => {
+                const toast = document.getElementById('copy-toast');
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 2000);
+            });
+        }
+
+        applyLanguage(JRData.getLanguage());
+    </script>
+</body>
+</html>

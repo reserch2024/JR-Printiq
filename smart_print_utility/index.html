@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JR Printiq | Smart Print Utility — Instant Quote Estimator</title>
+<meta name="description" content="Get an instant price estimate for your printing job. Calculate costs for wedding cards, visiting cards, brochures and more — powered by JR Printiq's Smart Print Utility."/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../shared/design-tokens.js"></script>
+<script src="../shared/components.js"></script>
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+    }
+    body { background-color: #faf8ff; }
+    .card-raised {
+        background: #ffffff;
+        border: 1px solid #E1E7F0;
+        box-shadow: 0 4px 12px rgba(11, 47, 107, 0.05);
+        border-radius: 10px;
+    }
+    .card-raised:hover {
+        box-shadow: 0 8px 24px rgba(11, 47, 107, 0.10);
+    }
+    .input-field {
+        height: 48px;
+        padding: 0 16px;
+        border: 1px solid #c3c6d6;
+        border-radius: 10px;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.2s;
+        background: #fff;
+        outline: none;
+    }
+    .input-field:focus {
+        border-color: #003ea3;
+        box-shadow: 0 0 0 2px rgba(0,62,163,0.10);
+    }
+    .product-chip {
+        cursor: pointer;
+        border: 2px solid #c3c6d6;
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+        transition: all 0.2s;
+        background: #fff;
+        user-select: none;
+    }
+    .product-chip:hover { border-color: #003ea3; }
+    .product-chip.active {
+        border-color: #003ea3;
+        background: #003ea3;
+        color: #fff;
+    }
+    .product-chip.active .chip-icon { color: #fff; }
+    .chip-icon { color: #003ea3; font-size: 28px; display: block; margin-bottom: 4px; }
+    .range-input {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: #dae1ff;
+        outline: none;
+    }
+    .range-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        background: #003ea3;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,62,163,0.3);
+    }
+    .price-ticker {
+        font-size: 48px;
+        font-family: Poppins, sans-serif;
+        font-weight: 700;
+        color: #003ea3;
+        line-height: 1;
+        transition: all 0.3s;
+    }
+    .finish-option {
+        cursor: pointer;
+        border: 2px solid #c3c6d6;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: #fff;
+    }
+    .finish-option.active { border-color: #003ea3; background: #dae1ff; color: #003ea3; font-weight: 600; }
+    @keyframes popIn {
+        0% { transform: scale(0.95); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .pop-in { animation: popIn 0.3s ease-out; }
+    .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+</style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen">
+
+<div id="header-mount"></div>
+
+<main class="pt-24 pb-xl max-w-max_width mx-auto px-gutter">
+
+    <!-- Hero -->
+    <div class="text-center mb-lg">
+        <span class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-label-caps font-label-caps mb-sm">
+            <span class="material-symbols-outlined" style="font-size:16px">calculate</span>
+            Smart Print Utility
+        </span>
+        <h1 class="text-h1-mobile md:text-h1 font-h1 text-on-surface mt-sm">Instant Price Estimator</h1>
+        <p class="text-body-lg text-on-surface-variant max-w-xl mx-auto mt-sm">
+            Get a quick estimate for your printing order in seconds. No account needed — fill in your specs and we'll crunch the numbers.
+        </p>
+        <p class="text-hindi-body font-hindi text-on-surface-variant/70 mt-xs">
+            तुरंत अपने प्रिंटिंग की लागत जानें — बिना किसी अकाउंट के
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+
+        <!-- Left: Configuration Panel -->
+        <div class="lg:col-span-2 space-y-md">
+
+            <!-- Step 1: Product Type -->
+            <div class="card-raised p-md">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="step-dot bg-primary text-on-primary">1</div>
+                    <div>
+                        <h2 class="font-h3 text-body-lg">Select Product Type</h2>
+                        <p class="text-body-sm text-on-surface-variant">What would you like to print?</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-sm" id="product-grid">
+                    <div class="product-chip active" onclick="selectProduct(this,'wedding_card', 'Wedding Cards', 2.5)" id="chip-wedding">
+                        <span class="material-symbols-outlined chip-icon">favorite</span>
+                        <span class="text-body-sm font-semibold">Wedding Cards</span>
+                    </div>
+                    <div class="product-chip" onclick="selectProduct(this,'visiting_card', 'Visiting Cards', 1.2)" id="chip-visiting">
+                        <span class="material-symbols-outlined chip-icon">badge</span>
+                        <span class="text-body-sm font-semibold">Visiting Cards</span>
+                    </div>
+                    <div class="product-chip" onclick="selectProduct(this,'invitation', 'Invitations', 2.0)" id="chip-invite">
+                        <span class="material-symbols-outlined chip-icon">celebration</span>
+                        <span class="text-body-sm font-semibold">Invitations</span>
+                    </div>
+                    <div class="product-chip" onclick="selectProduct(this,'brochure', 'Brochures', 1.8)" id="chip-brochure">
+                        <span class="material-symbols-outlined chip-icon">menu_book</span>
+                        <span class="text-body-sm font-semibold">Brochures</span>
+                    </div>
+                    <div class="product-chip" onclick="selectProduct(this,'poster', 'Posters/Banners', 3.5)" id="chip-poster">
+                        <span class="material-symbols-outlined chip-icon">map</span>
+                        <span class="text-body-sm font-semibold">Posters/Banners</span>
+                    </div>
+                    <div class="product-chip" onclick="selectProduct(this,'custom', 'Custom Print', 2.2)" id="chip-custom">
+                        <span class="material-symbols-outlined chip-icon">tune</span>
+                        <span class="text-body-sm font-semibold">Custom Print</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Quantity -->
+            <div class="card-raised p-md">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="step-dot bg-primary text-on-primary">2</div>
+                    <div>
+                        <h2 class="font-h3 text-body-lg">Quantity</h2>
+                        <p class="text-body-sm text-on-surface-variant">How many pieces do you need?</p>
+                    </div>
+                </div>
+                <div class="space-y-md">
+                    <div class="flex items-center gap-md">
+                        <input type="range" min="50" max="5000" step="50" value="200" id="quantity-slider" class="range-input flex-1" oninput="updateQuantity(this.value)">
+                        <div class="flex items-center gap-xs border border-outline-variant/40 rounded-[10px] overflow-hidden">
+                            <button onclick="adjustQty(-50)" class="h-10 w-10 flex items-center justify-center bg-surface-container hover:bg-primary/10 transition-colors">
+                                <span class="material-symbols-outlined" style="font-size:18px">remove</span>
+                            </button>
+                            <input type="number" id="quantity-input" value="200" min="50" max="5000" step="50"
+                                class="w-24 text-center font-bold text-on-surface h-10 border-none outline-none text-body-md"
+                                oninput="syncSlider(this.value)">
+                            <button onclick="adjustQty(50)" class="h-10 w-10 flex items-center justify-center bg-surface-container hover:bg-primary/10 transition-colors">
+                                <span class="material-symbols-outlined" style="font-size:18px">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-sm flex-wrap" id="qty-presets">
+                        <button onclick="setQty(100)" class="qty-preset-btn px-3 py-1 rounded-full border border-outline-variant text-body-sm hover:border-primary hover:text-primary transition-all">100</button>
+                        <button onclick="setQty(200)" class="qty-preset-btn px-3 py-1 rounded-full border border-outline-variant text-body-sm hover:border-primary hover:text-primary transition-all">200</button>
+                        <button onclick="setQty(500)" class="qty-preset-btn px-3 py-1 rounded-full border border-outline-variant text-body-sm hover:border-primary hover:text-primary transition-all">500</button>
+                        <button onclick="setQty(1000)" class="qty-preset-btn px-3 py-1 rounded-full border border-outline-variant text-body-sm hover:border-primary hover:text-primary transition-all">1,000</button>
+                        <button onclick="setQty(2000)" class="qty-preset-btn px-3 py-1 rounded-full border border-outline-variant text-body-sm hover:border-primary hover:text-primary transition-all">2,000</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Paper & Finish -->
+            <div class="card-raised p-md">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="step-dot bg-primary text-on-primary">3</div>
+                    <div>
+                        <h2 class="font-h3 text-body-lg">Paper & Finish</h2>
+                        <p class="text-body-sm text-on-surface-variant">Select your preferred paper quality and finish</p>
+                    </div>
+                </div>
+                <div class="space-y-md">
+                    <div>
+                        <label class="block text-label-caps text-on-surface-variant mb-sm uppercase tracking-wider">GSM / Thickness</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-sm" id="gsm-grid">
+                            <button onclick="selectGSM(this,250,1.0)" class="gsm-btn finish-option">250 GSM<br><span class="text-[11px] text-on-surface-variant">Standard</span></button>
+                            <button onclick="selectGSM(this,300,1.2)" class="gsm-btn finish-option active">300 GSM<br><span class="text-[11px]">Premium</span></button>
+                            <button onclick="selectGSM(this,350,1.4)" class="gsm-btn finish-option">350 GSM<br><span class="text-[11px] text-on-surface-variant">Luxury</span></button>
+                            <button onclick="selectGSM(this,400,1.6)" class="gsm-btn finish-option">400 GSM<br><span class="text-[11px] text-on-surface-variant">Super Heavy</span></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-label-caps text-on-surface-variant mb-sm uppercase tracking-wider">Finish Type</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-sm" id="finish-grid">
+                            <button onclick="selectFinish(this,'Matte',1.0)" class="finish-btn finish-option active">Matte Lamination</button>
+                            <button onclick="selectFinish(this,'Gloss',1.1)" class="finish-btn finish-option">Gloss UV</button>
+                            <button onclick="selectFinish(this,'Gold Foil',1.5)" class="finish-btn finish-option">Gold Foil</button>
+                            <button onclick="selectFinish(this,'Velvet',1.4)" class="finish-btn finish-option">Velvet Touch</button>
+                            <button onclick="selectFinish(this,'Emboss',1.35)" class="finish-btn finish-option">Embossed</button>
+                            <button onclick="selectFinish(this,'Digital',0.9)" class="finish-btn finish-option">Digital Print</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Extra Options -->
+            <div class="card-raised p-md">
+                <div class="flex items-center gap-sm mb-md">
+                    <div class="step-dot bg-primary text-on-primary">4</div>
+                    <div>
+                        <h2 class="font-h3 text-body-lg">Extra Options</h2>
+                        <p class="text-body-sm text-on-surface-variant">Add-ons that affect the final price</p>
+                    </div>
+                </div>
+                <div class="space-y-sm">
+                    <label class="flex items-center justify-between p-sm rounded-[10px] border border-outline-variant/30 hover:border-primary cursor-pointer transition-all">
+                        <div class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-primary">markunread_mailbox</span>
+                            <div>
+                                <p class="font-semibold text-body-sm">Matching Envelope</p>
+                                <p class="text-[12px] text-on-surface-variant">Coordinated envelopes with inner print</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-sm">
+                            <span class="text-body-sm text-on-surface-variant">+₹0.80/pc</span>
+                            <input type="checkbox" id="opt-envelope" onchange="recalculate()" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary">
+                        </div>
+                    </label>
+                    <label class="flex items-center justify-between p-sm rounded-[10px] border border-outline-variant/30 hover:border-primary cursor-pointer transition-all">
+                        <div class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-primary">local_shipping</span>
+                            <div>
+                                <p class="font-semibold text-body-sm">Home Delivery (UP)</p>
+                                <p class="text-[12px] text-on-surface-variant">Doorstep delivery anywhere in UP</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-sm">
+                            <span class="text-body-sm text-on-surface-variant">+₹200 flat</span>
+                            <input type="checkbox" id="opt-delivery" onchange="recalculate()" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary">
+                        </div>
+                    </label>
+                    <label class="flex items-center justify-between p-sm rounded-[10px] border border-outline-variant/30 hover:border-primary cursor-pointer transition-all">
+                        <div class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-primary">design_services</span>
+                            <div>
+                                <p class="font-semibold text-body-sm">Design Assistance</p>
+                                <p class="text-[12px] text-on-surface-variant">Expert customization of text & layout</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-sm">
+                            <span class="text-body-sm text-on-surface-variant">+₹299 one-time</span>
+                            <input type="checkbox" id="opt-design" onchange="recalculate()" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary">
+                        </div>
+                    </label>
+                    <label class="flex items-center justify-between p-sm rounded-[10px] border border-outline-variant/30 hover:border-primary cursor-pointer transition-all">
+                        <div class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-primary">speed</span>
+                            <div>
+                                <p class="font-semibold text-body-sm">Rush Order (48hr)</p>
+                                <p class="text-[12px] text-on-surface-variant">Priority processing, delivered in 2 days</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-sm">
+                            <span class="text-body-sm text-on-surface-variant">+25%</span>
+                            <input type="checkbox" id="opt-rush" onchange="recalculate()" class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary">
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Quote Panel (sticky) -->
+        <div class="lg:col-span-1">
+            <div class="card-raised p-md sticky top-24" id="quote-panel">
+                <div class="flex items-center gap-sm mb-md border-b border-outline-variant/20 pb-md">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                    </div>
+                    <div>
+                        <h2 class="font-h3 text-body-lg">Your Estimate</h2>
+                        <p class="text-label-caps text-on-surface-variant">Live calculation</p>
+                    </div>
+                </div>
+
+                <!-- Price Display -->
+                <div class="text-center my-md">
+                    <p class="text-label-caps text-on-surface-variant uppercase tracking-wider mb-xs">Estimated Total</p>
+                    <div id="price-display" class="price-ticker pop-in">₹600</div>
+                    <p class="text-body-sm text-on-surface-variant mt-xs" id="price-per-unit">₹3.00 per piece</p>
+                </div>
+
+                <!-- Breakdown -->
+                <div class="space-y-sm text-body-sm border-t border-outline-variant/20 pt-md mb-md" id="breakdown-list">
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">Product</span>
+                        <span class="font-semibold" id="bd-product">Wedding Cards</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">Quantity</span>
+                        <span class="font-semibold" id="bd-qty">200 pcs</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">Paper</span>
+                        <span class="font-semibold" id="bd-paper">300 GSM</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-on-surface-variant">Finish</span>
+                        <span class="font-semibold" id="bd-finish">Matte</span>
+                    </div>
+                    <div id="bd-extras-row" class="flex justify-between hidden">
+                        <span class="text-on-surface-variant">Add-ons</span>
+                        <span class="font-semibold text-primary" id="bd-extras">—</span>
+                    </div>
+                </div>
+
+                <!-- Turnaround -->
+                <div class="bg-primary/5 rounded-[10px] p-sm mb-md flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary">schedule</span>
+                    <div>
+                        <p class="text-body-sm font-semibold">Estimated Turnaround</p>
+                        <p class="text-label-caps text-on-surface-variant" id="turnaround-text">5-7 Business Days</p>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <p class="text-[11px] text-on-surface-variant/70 mb-md leading-relaxed">
+                    * This is an approximate estimate. Final pricing will be confirmed by our team based on exact design specifications.
+                </p>
+
+                <!-- Actions -->
+                <div class="space-y-sm">
+                    <button onclick="requestQuote()"
+                        class="w-full h-12 bg-primary text-on-primary font-bold text-body-sm rounded-[10px] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-sm">
+                        <span class="material-symbols-outlined" style="font-size:20px">chat</span>
+                        Get Exact Quote on WhatsApp
+                    </button>
+                    <a href="../catalog_wedding_cards/index.html"
+                        class="w-full h-12 border border-primary text-primary font-bold text-body-sm rounded-[10px] hover:bg-primary/5 transition-all flex items-center justify-center gap-sm">
+                        <span class="material-symbols-outlined" style="font-size:20px">grid_view</span>
+                        Browse Catalog
+                    </a>
+                    <a href="../booking_requirement_form/index.html"
+                        class="w-full h-12 bg-surface-container text-on-surface font-bold text-body-sm rounded-[10px] hover:bg-surface-container-high transition-all flex items-center justify-center gap-sm">
+                        <span class="material-symbols-outlined" style="font-size:20px">assignment</span>
+                        Place a Booking
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How Pricing Works -->
+    <section class="mt-xl card-raised p-lg">
+        <h2 class="text-h2 font-h2 text-center mb-lg">How Our Pricing Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-lg text-center">
+            <div class="flex flex-col items-center gap-sm">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined" style="font-size:28px">inventory_2</span>
+                </div>
+                <h3 class="font-semibold text-body-lg">Volume Discounts</h3>
+                <p class="text-body-sm text-on-surface-variant">The more you print, the less you pay per piece. Orders above 500 units get up to 20% savings.</p>
+            </div>
+            <div class="flex flex-col items-center gap-sm">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined" style="font-size:28px">star</span>
+                </div>
+                <h3 class="font-semibold text-body-lg">Premium Finishes</h3>
+                <p class="text-body-sm text-on-surface-variant">Gold foil, embossing, and velvet touch are available as add-on finishes for a truly luxurious result.</p>
+            </div>
+            <div class="flex flex-col items-center gap-sm">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined" style="font-size:28px">handshake</span>
+                </div>
+                <h3 class="font-semibold text-body-lg">No Hidden Charges</h3>
+                <p class="text-body-sm text-on-surface-variant">The price you agree to is the price you pay. All GST and charges are transparently communicated upfront.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div id="footer-mount"></div>
+<div id="fab-mount"></div>
+
+<script>
+    document.getElementById('header-mount').innerHTML = renderHeader('', '../');
+    document.getElementById('footer-mount').innerHTML = renderFooter('../');
+    document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+    // ── State ──────────────────────────────────────────────
+    let state = {
+        product: 'wedding_card',
+        productLabel: 'Wedding Cards',
+        baseRate: 2.5,   // ₹ per piece base
+        qty: 200,
+        gsmMult: 1.2,
+        gsmLabel: '300 GSM',
+        finishMult: 1.0,
+        finishLabel: 'Matte'
+    };
+
+    // ── Product Selection ──────────────────────────────────
+    function selectProduct(el, id, label, rate) {
+        document.querySelectorAll('.product-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        state.product = id;
+        state.productLabel = label;
+        state.baseRate = rate;
+        recalculate();
+    }
+
+    // ── Quantity ───────────────────────────────────────────
+    function updateQuantity(val) {
+        val = Math.max(50, Math.min(5000, parseInt(val) || 50));
+        state.qty = val;
+        document.getElementById('quantity-input').value = val;
+        document.getElementById('quantity-slider').value = val;
+        recalculate();
+    }
+    function syncSlider(val) { updateQuantity(parseInt(val) || 50); }
+    function adjustQty(delta) { updateQuantity(state.qty + delta); }
+    function setQty(val) { updateQuantity(val); }
+
+    // ── GSM ───────────────────────────────────────────────
+    function selectGSM(el, gsm, mult) {
+        document.querySelectorAll('.gsm-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        state.gsmMult = mult;
+        state.gsmLabel = gsm + ' GSM';
+        recalculate();
+    }
+
+    // ── Finish ────────────────────────────────────────────
+    function selectFinish(el, label, mult) {
+        document.querySelectorAll('.finish-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        state.finishMult = mult;
+        state.finishLabel = label;
+        recalculate();
+    }
+
+    // ── Recalculate ────────────────────────────────────────
+    function recalculate() {
+        const qty = state.qty;
+        const base = state.baseRate;
+        const gsmM = state.gsmMult;
+        const finM = state.finishMult;
+
+        // Volume discount
+        let volDiscount = 1.0;
+        if (qty >= 2000) volDiscount = 0.78;
+        else if (qty >= 1000) volDiscount = 0.84;
+        else if (qty >= 500) volDiscount = 0.90;
+        else if (qty >= 200) volDiscount = 0.95;
+
+        let perPiece = base * gsmM * finM * volDiscount;
+
+        // Add-ons
+        let extras = 0;
+        const extrasLabels = [];
+        if (document.getElementById('opt-envelope').checked) { extras += 0.80 * qty; extrasLabels.push('Envelope'); }
+        if (document.getElementById('opt-delivery').checked) { extras += 200; extrasLabels.push('Delivery'); }
+        if (document.getElementById('opt-design').checked) { extras += 299; extrasLabels.push('Design'); }
+
+        let total = perPiece * qty + extras;
+
+        // Rush order +25%
+        if (document.getElementById('opt-rush').checked) { total *= 1.25; perPiece *= 1.25; extrasLabels.push('Rush +25%'); }
+
+        // Update UI
+        document.getElementById('price-display').textContent = '₹' + Math.round(total).toLocaleString('en-IN');
+        document.getElementById('price-per-unit').textContent = '₹' + perPiece.toFixed(2) + ' per piece';
+        document.getElementById('bd-product').textContent = state.productLabel;
+        document.getElementById('bd-qty').textContent = qty.toLocaleString('en-IN') + ' pcs';
+        document.getElementById('bd-paper').textContent = state.gsmLabel;
+        document.getElementById('bd-finish').textContent = state.finishLabel;
+
+        const extrasRow = document.getElementById('bd-extras-row');
+        if (extrasLabels.length) {
+            extrasRow.classList.remove('hidden');
+            document.getElementById('bd-extras').textContent = extrasLabels.join(', ');
+        } else {
+            extrasRow.classList.add('hidden');
+        }
+
+        // Turnaround
+        let turn = '5-7 Business Days';
+        if (state.product === 'visiting_card') turn = '2-3 Business Days';
+        if (state.product === 'poster') turn = '1-2 Business Days';
+        if (document.getElementById('opt-rush').checked) turn = '48 Hours (Rush)';
+        document.getElementById('turnaround-text').textContent = turn;
+
+        // Animate price
+        const pd = document.getElementById('price-display');
+        pd.classList.remove('pop-in');
+        void pd.offsetWidth;
+        pd.classList.add('pop-in');
+    }
+
+    function requestQuote() {
+        const qty = state.qty;
+        const product = state.productLabel;
+        const gsm = state.gsmLabel;
+        const finish = state.finishLabel;
+        const price = document.getElementById('price-display').textContent;
+        const msg = encodeURIComponent(
+            `Hello JR Printiq! I'd like a quote for:\n\n` +
+            `Product: ${product}\nQuantity: ${qty} pcs\nPaper: ${gsm}\nFinish: ${finish}\nEstimated: ${price}\n\n` +
+            `Please confirm the final price and availability.`
+        );
+        window.open(`https://wa.me/917376550040?text=${msg}`, '_blank');
+    }
+
+    // Initial calc
+    recalculate();
+    applyLanguage(JRData.getLanguage());
+</script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JR Printiq | Proof Approval</title>
+    <meta name="description" content="Review and approve your print proof before we begin production.">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="../shared/design-tokens.js"></script>
+    <script src="../shared/components.js"></script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F7F9FC; }
+        .card-shadow { box-shadow: 0 4px 12px rgba(11,47,107,0.05); }
+        .proof-zoom { transition: transform 0.3s ease; cursor: zoom-in; }
+        .proof-zoom.zoomed { transform: scale(1.5); cursor: zoom-out; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen">
+    <div id="header-mount"></div>
+
+    <main class="pt-24 pb-xl max-w-max_width mx-auto px-gutter">
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 mb-md text-on-surface-variant font-label-caps text-label-caps">
+            <a href="../order_tracking/index.html" class="hover:text-primary transition-colors">Track Order</a>
+            <span class="material-symbols-outlined" style="font-size:14px">chevron_right</span>
+            <span class="text-on-surface font-bold" id="breadcrumb-id">Proof Approval</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+            <!-- Proof Display -->
+            <div class="lg:col-span-7">
+                <!-- Hard Gate Banner -->
+                <div id="gate-banner" class="bg-[#C98A1F]/10 border border-[#C98A1F]/20 rounded-xl p-md mb-md flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-[#C98A1F]">lock</span>
+                    <p class="text-body-sm font-semibold text-[#C98A1F]" data-en="Production cannot begin until you approve this proof." data-hi="जब तक आप इस प्रूफ़ को मंजूरी नहीं देते, उत्पादन शुरू नहीं हो सकता।">Production cannot begin until you approve this proof.</p>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow overflow-hidden">
+                    <div class="p-sm bg-surface-container-high/50 border-b border-outline-variant/20 flex items-center justify-between">
+                        <div class="flex items-center gap-xs">
+                            <span class="material-symbols-outlined text-primary" style="font-size:18px">preview</span>
+                            <span class="font-bold text-body-sm">Proof Preview</span>
+                        </div>
+                        <span class="text-body-sm text-on-surface-variant" id="proof-sent-date"></span>
+                    </div>
+                    <div class="p-md flex items-center justify-center min-h-[400px] bg-surface-container-low/30 overflow-hidden">
+                        <img id="proof-image" src="" alt="Print Proof" class="max-w-full max-h-[500px] rounded-lg proof-zoom shadow-lg" onclick="toggleZoom(this)">
+                    </div>
+                    <div class="p-sm border-t border-outline-variant/20 text-center">
+                        <p class="text-body-sm text-on-surface-variant">Click image to zoom in/out</p>
+                    </div>
+                </div>
+
+                <!-- Proof History -->
+                <div id="proof-history" class="mt-md hidden">
+                    <h4 class="text-body-lg font-bold mb-sm flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary" style="font-size:18px">history</span>
+                        Revision History
+                    </h4>
+                    <div id="proof-comments-list" class="space-y-sm"></div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-5 space-y-md">
+                <!-- Booking Summary -->
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md">
+                    <h3 class="text-h3 font-h3 mb-sm flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary">receipt</span>
+                        Booking Details
+                    </h3>
+                    <div class="space-y-sm" id="booking-details">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Approval Actions -->
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow p-md" id="approval-section">
+                    <h3 class="text-h3 font-h3 mb-md">Your Decision</h3>
+                    
+                    <!-- Approve Button -->
+                    <button onclick="approveProof()" id="approve-btn" class="w-full bg-[#2E8B57] text-white font-bold py-4 rounded-[10px] shadow-md hover:bg-[#2E8B57]/90 transition-all active:scale-95 flex items-center justify-center gap-sm mb-sm text-body-lg">
+                        <span class="material-symbols-outlined">thumb_up</span>
+                        Approve Proof
+                    </button>
+                    
+                    <!-- Request Changes Toggle -->
+                    <button onclick="toggleChangeForm()" id="changes-toggle-btn" class="w-full border-2 border-[#C98A1F] text-[#C98A1F] font-bold py-4 rounded-[10px] hover:bg-[#C98A1F]/5 transition-all active:scale-95 flex items-center justify-center gap-sm text-body-lg">
+                        <span class="material-symbols-outlined">edit</span>
+                        Request Changes
+                    </button>
+
+                    <!-- Change Request Form (hidden initially) -->
+                    <div id="change-form" class="hidden mt-md border-t border-outline-variant/20 pt-md">
+                        <label class="block text-body-sm text-on-surface-variant mb-xs font-semibold">Describe the changes needed:</label>
+                        <textarea id="change-comment" rows="4" placeholder="e.g. Please change the venue address to... / Font size for names should be larger..."
+                            class="w-full p-md border border-outline-variant rounded-[10px] focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all resize-none"></textarea>
+                        <button onclick="submitChangeRequest()" class="mt-sm w-full bg-[#C98A1F] text-white font-bold py-3 rounded-[10px] hover:bg-[#C98A1F]/90 transition-all active:scale-95 flex items-center justify-center gap-sm">
+                            <span class="material-symbols-outlined">send</span>
+                            Submit Change Request
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Already Approved State -->
+                <div id="approved-state" class="hidden bg-[#2E8B57]/10 border border-[#2E8B57]/30 rounded-xl card-shadow p-md text-center">
+                    <div class="w-16 h-16 mx-auto bg-[#2E8B57] rounded-full flex items-center justify-center mb-sm">
+                        <span class="material-symbols-outlined text-white" style="font-size:32px;font-variation-settings:'FILL' 1">verified</span>
+                    </div>
+                    <h3 class="text-h3 font-h3 text-[#2E8B57] mb-xs">Proof Approved!</h3>
+                    <p class="text-body-sm text-on-surface-variant mb-md">Your order is now moving to production. You'll receive updates on WhatsApp.</p>
+                    <a href="../order_tracking/index.html" class="inline-flex items-center gap-sm text-primary font-bold hover:underline">
+                        <span class="material-symbols-outlined">location_searching</span>
+                        Track Your Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-mount"></div>
+    <div id="fab-mount"></div>
+
+    <script>
+        document.getElementById('header-mount').innerHTML = renderHeader('', '../');
+        document.getElementById('footer-mount').innerHTML = renderFooter('../');
+        document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
+        let booking = bookingId ? JRData.getBookingById(bookingId) : null;
+
+        // If no specific booking, use the demo proof booking
+        if (!booking) {
+            booking = JRData.getBookings().find(b => b.status === 'proof_sent');
+        }
+
+        if (booking) {
+            document.getElementById('breadcrumb-id').textContent = `Proof — ${booking.id}`;
+            document.title = `JR Printiq | Proof for ${booking.id}`;
+
+            // Set proof image
+            const proofImg = document.getElementById('proof-image');
+            proofImg.src = booking.proofUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBfikXV2HtcFAv9Xt38MkxlsfhK7tT-EqLm57L_3jkxOgKYhFftZSKdQcs-5dK_Ocex9XIiiftVMkZF-OOu5TczOlI5dqMaXQlpnztVBVAVR2I7MuIQeG5n1bnjndBJSOPu2_6gYxTPQ2GMqF964FAM5QuPSzqm4m---gpiN-Jzapk-EChe80-luHbq7ZBhyCdPR0BIK5URYkZrre-N9zy_c4vzD3l77Er7Tvf9z_or2dQCouUx2NtIpaHMgxWRUaiV3c3PnTG-ethh';
+
+            // Proof sent date
+            const proofEntry = (booking.statusHistory || []).find(h => h.status === 'proof_sent');
+            if (proofEntry) {
+                document.getElementById('proof-sent-date').textContent = 'Sent: ' + formatDateTime(proofEntry.date);
+            }
+
+            // Booking details sidebar
+            document.getElementById('booking-details').innerHTML = `
+                <div class="flex justify-between py-2 border-b border-outline-variant/10">
+                    <span class="text-on-surface-variant text-body-sm">Booking ID</span>
+                    <span class="font-bold text-body-sm">${booking.id}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-outline-variant/10">
+                    <span class="text-on-surface-variant text-body-sm">Design</span>
+                    <span class="font-bold text-body-sm">${booking.designName}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-outline-variant/10">
+                    <span class="text-on-surface-variant text-body-sm">Names</span>
+                    <span class="font-bold text-body-sm">${booking.names}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-outline-variant/10">
+                    <span class="text-on-surface-variant text-body-sm">Quantity</span>
+                    <span class="font-bold text-body-sm">${booking.quantity} pcs</span>
+                </div>
+                <div class="flex justify-between py-2">
+                    <span class="text-on-surface-variant text-body-sm">Language</span>
+                    <span class="font-bold text-body-sm">${booking.language}</span>
+                </div>
+            `;
+
+            // Show proof comments
+            if (booking.proofComments && booking.proofComments.length > 0) {
+                document.getElementById('proof-history').classList.remove('hidden');
+                document.getElementById('proof-comments-list').innerHTML = booking.proofComments.map(c => `
+                    <div class="bg-surface-container-low/50 rounded-lg p-sm border border-outline-variant/10">
+                        <div class="flex justify-between items-center mb-xs">
+                            <span class="text-label-caps font-label-caps text-[#C98A1F]">Change Requested</span>
+                            <span class="text-label-caps text-on-surface-variant">${formatDateTime(c.date)}</span>
+                        </div>
+                        <p class="text-body-sm">${c.comment}</p>
+                    </div>
+                `).join('');
+            }
+
+            // If already approved, show approved state
+            if (booking.proofApproved || booking.status === 'proof_approved' || booking.status === 'in_print' || booking.status === 'ready' || booking.status === 'delivered') {
+                document.getElementById('approval-section').classList.add('hidden');
+                document.getElementById('approved-state').classList.remove('hidden');
+                document.getElementById('gate-banner').innerHTML = `
+                    <span class="material-symbols-outlined text-[#2E8B57]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                    <p class="text-body-sm font-semibold text-[#2E8B57]">Proof has been approved. Production is underway.</p>
+                `;
+                document.getElementById('gate-banner').className = 'bg-[#2E8B57]/10 border border-[#2E8B57]/20 rounded-xl p-md mb-md flex items-center gap-sm';
+            }
+        }
+
+        function toggleZoom(img) {
+            img.classList.toggle('zoomed');
+        }
+
+        function toggleChangeForm() {
+            const form = document.getElementById('change-form');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                document.getElementById('change-comment').focus();
+            }
+        }
+
+        function approveProof() {
+            if (!booking) return;
+            if (!confirm('Are you sure you want to approve this proof? Production will begin immediately.')) return;
+
+            JRData.updateBooking(booking.id, { proofApproved: true });
+            JRData.updateBookingStatus(booking.id, 'proof_approved', 'Client approved proof');
+
+            document.getElementById('approval-section').classList.add('hidden');
+            document.getElementById('approved-state').classList.remove('hidden');
+            document.getElementById('gate-banner').innerHTML = `
+                <span class="material-symbols-outlined text-[#2E8B57]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                <p class="text-body-sm font-semibold text-[#2E8B57]">Proof approved! Production is now underway.</p>
+            `;
+            document.getElementById('gate-banner').className = 'bg-[#2E8B57]/10 border border-[#2E8B57]/20 rounded-xl p-md mb-md flex items-center gap-sm';
+        }
+
+        function submitChangeRequest() {
+            const comment = document.getElementById('change-comment').value.trim();
+            if (!comment) { alert('Please describe the changes you need.'); return; }
+            if (!booking) return;
+
+            const updatedBooking = JRData.getBookingById(booking.id);
+            updatedBooking.proofComments = updatedBooking.proofComments || [];
+            updatedBooking.proofComments.push({ comment, date: new Date().toISOString() });
+            JRData.updateBooking(booking.id, { proofComments: updatedBooking.proofComments });
+
+            document.getElementById('change-comment').value = '';
+            document.getElementById('change-form').classList.add('hidden');
+
+            // Show history
+            document.getElementById('proof-history').classList.remove('hidden');
+            document.getElementById('proof-comments-list').innerHTML = updatedBooking.proofComments.map(c => `
+                <div class="bg-surface-container-low/50 rounded-lg p-sm border border-outline-variant/10">
+                    <div class="flex justify-between items-center mb-xs">
+                        <span class="text-label-caps font-label-caps text-[#C98A1F]">Change Requested</span>
+                        <span class="text-label-caps text-on-surface-variant">${formatDateTime(c.date)}</span>
+                    </div>
+                    <p class="text-body-sm">${c.comment}</p>
+                </div>
+            `).join('');
+
+            alert('Change request submitted! Our team will update the proof and send a new version.');
+        }
+
+        applyLanguage(JRData.getLanguage());
+    </script>
+</body>
+</html>

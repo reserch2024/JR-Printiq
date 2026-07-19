@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JR Printiq | Price Change Notice</title>
+    <meta name="description" content="Review and approve changes in order pricing.">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="../shared/design-tokens.js"></script>
+    <script src="../shared/components.js"></script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F7F9FC; }
+        .card-shadow { box-shadow: 0 4px 12px rgba(11,47,107,0.05); }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen">
+    <div id="header-mount"></div>
+
+    <main class="pt-24 pb-xl max-w-max_width mx-auto px-gutter">
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 mb-md text-on-surface-variant font-label-caps text-label-caps">
+            <a href="../order_tracking/index.html" class="hover:text-primary transition-colors">Track Order</a>
+            <span class="material-symbols-outlined" style="font-size:14px">chevron_right</span>
+            <span class="text-on-surface font-bold" id="breadcrumb-id">Price Change Notice</span>
+        </nav>
+
+        <div class="max-w-2xl mx-auto">
+            <!-- Warning Header Banner -->
+            <div class="bg-[#C98A1F]/10 border border-[#C98A1F]/20 rounded-xl p-md mb-lg flex items-start gap-sm">
+                <span class="material-symbols-outlined text-[#C98A1F] mt-0.5">warning</span>
+                <div>
+                    <h2 class="font-bold text-[#C98A1F] text-body-md" data-en="Price Update Review Required" data-hi="मूल्य अपडेट समीक्षा आवश्यक है">Price Update Review Required</h2>
+                    <p class="text-body-sm text-on-surface-variant mt-xs" data-en="The estimated printing cost has changed by 20% or more. Please review and approve to proceed with production." data-hi="अनुमानित प्रिंटिंग लागत में 20% या अधिक का बदलाव आया है। उत्पादन शुरू करने के लिए कृपया समीक्षा करें और स्वीकृति दें।">The estimated printing cost has changed by 20% or more. Please review and approve to proceed with production.</p>
+                </div>
+            </div>
+
+            <!-- Price Comparison Card -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl card-shadow overflow-hidden mb-lg">
+                <div class="p-md bg-surface-container-high/50 border-b border-outline-variant/20 flex items-center justify-between">
+                    <span class="font-bold text-body-sm flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-primary" style="font-size:18px">payments</span>
+                        Price Comparison
+                    </span>
+                    <span class="text-h3 font-h3 text-on-surface" id="booking-id-tag">JR-XXXXXX</span>
+                </div>
+                <div class="p-lg grid grid-cols-1 md:grid-cols-2 gap-lg border-b border-outline-variant/10 text-center">
+                    <div class="p-md bg-surface-container-low rounded-lg">
+                        <p class="text-label-caps font-label-caps text-on-surface-variant/70 uppercase mb-xs">Original Estimate</p>
+                        <p class="text-h2 font-h2 text-on-surface-variant line-through" id="original-price">₹0</p>
+                    </div>
+                    <div class="p-md bg-[#C98A1F]/10 border border-[#C98A1F]/20 rounded-lg">
+                        <p class="text-label-caps font-label-caps text-[#C98A1F] uppercase mb-xs">New Final Price</p>
+                        <p class="text-h1 md:text-[40px] font-h1 text-on-surface" id="new-price">₹0</p>
+                        <p class="text-body-sm text-[#C0392B] font-bold mt-xs" id="price-difference-pct">+0% Difference</p>
+                    </div>
+                </div>
+                
+                <!-- Reasons/Notes -->
+                <div class="p-md bg-surface-container-lowest">
+                    <h4 class="text-body-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-xs">Note from Admin:</h4>
+                    <p class="text-body-md italic text-on-surface" id="price-change-reason">
+                        No comment provided by admin.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Non-Refundable Advance Notice -->
+            <div class="bg-[#C0392B]/5 border border-[#C0392B]/20 rounded-xl p-md mb-lg flex items-start gap-sm text-left">
+                <span class="material-symbols-outlined text-[#C0392B] flex-shrink-0 mt-0.5" style="font-variation-settings:'FILL' 1">info</span>
+                <div>
+                    <p class="font-bold text-[#C0392B] text-body-sm" data-en="Important: Advance Payment Policy" data-hi="महत्वपूर्ण: अग्रिम भुगतान नीति">Important: Advance Payment Policy</p>
+                    <p class="text-body-sm text-on-surface-variant" data-en="Please note that once paid, advances are strictly non-refundable once received and logged. If you reject the new price, we can discuss alternatives or modifications to fit your original budget." data-hi="कृपया ध्यान दें कि एक बार भुगतान करने के बाद, अग्रिम राशि वापस नहीं की जा सकती।">Please note that once paid, advances are strictly non-refundable once received and logged. If you reject the new price, we can discuss alternatives or modifications to fit your original budget.</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-sm justify-center">
+                <button onclick="approvePrice()" id="approve-price-btn" class="w-full sm:w-auto min-w-[200px] h-14 bg-[#2E8B57] text-white font-bold px-lg py-4 rounded-[10px] shadow-md hover:bg-[#2E8B57]/90 transition-all active:scale-95 flex items-center justify-center gap-sm text-body-lg">
+                    <span class="material-symbols-outlined">thumb_up</span>
+                    Approve New Price
+                </button>
+                <a id="discuss-whatsapp-btn" href="#" target="_blank" class="w-full sm:w-auto min-w-[200px] h-14 border-2 border-primary text-primary font-bold px-lg py-4 rounded-[10px] hover:bg-primary/5 transition-all active:scale-95 flex items-center justify-center gap-sm text-body-lg">
+                    <span class="material-symbols-outlined">chat</span>
+                    Discuss / Reject via WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-mount"></div>
+    <div id="fab-mount"></div>
+
+    <script>
+        document.getElementById('header-mount').innerHTML = renderHeader('', '../');
+        document.getElementById('footer-mount').innerHTML = renderFooter('../');
+        document.getElementById('fab-mount').innerHTML = renderWhatsAppFAB();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
+        let booking = bookingId ? JRData.getBookingById(bookingId) : null;
+
+        // Fallback for demonstration if booking doesn't exist
+        if (!booking) {
+            // Let's grab the first booking or create a simulation
+            const bookings = JRData.getBookings();
+            booking = bookings.find(b => b.status === 'price_change_pending') || bookings[0];
+        }
+
+        if (booking) {
+            document.getElementById('breadcrumb-id').textContent = `Price Notice — ${booking.id}`;
+            document.getElementById('booking-id-tag').textContent = booking.id;
+            document.title = `JR Printiq | Price Change Notice for ${booking.id}`;
+
+            // Handle simulation or actual priceChange field
+            const originalVal = booking.paymentLog ? (booking.paymentLog.originalPrice || booking.paymentLog.finalPrice * 0.8) : 10000;
+            const newVal = booking.paymentLog ? booking.paymentLog.finalPrice : 13000;
+            const diffPct = Math.round(((newVal - originalVal) / originalVal) * 100);
+            const adminReason = booking.priceChangeReason || "Adjusted pricing due to premium GSM cardstock availability and additional gold foil elements requested.";
+
+            document.getElementById('original-price').textContent = formatCurrency(originalVal);
+            document.getElementById('new-price').textContent = formatCurrency(newVal);
+            document.getElementById('price-difference-pct').textContent = `+${diffPct}% Difference`;
+            document.getElementById('price-change-reason').textContent = adminReason;
+
+            // WhatsApp link setup
+            const waMsg = encodeURIComponent(`Hi, regarding my Booking ID ${booking.id}. I would like to discuss the updated price change of ${formatCurrency(newVal)} (originally estimated at ${formatCurrency(originalVal)}).`);
+            document.getElementById('discuss-whatsapp-btn').href = `https://wa.me/917376550040?text=${waMsg}`;
+
+            // Check if status is already approved/resolved
+            if (booking.status !== 'price_change_pending' && booking.status !== 'submitted') {
+                // If it's already approved, disable approve button
+                const approveBtn = document.getElementById('approve-price-btn');
+                approveBtn.disabled = true;
+                approveBtn.classList.remove('bg-[#2E8B57]', 'hover:bg-[#2E8B57]/90');
+                approveBtn.classList.add('bg-surface-container-high', 'text-outline', 'cursor-not-allowed');
+                approveBtn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Approved`;
+            }
+        }
+
+        function approvePrice() {
+            if (!booking) return;
+            if (!confirm('Are you sure you want to approve this updated price?')) return;
+
+            // Update status back to confirmed or advance_received depending on history
+            const hasPaidAdvance = booking.paymentLog && booking.paymentLog.advanceAmount > 0;
+            const targetStatus = hasPaidAdvance ? 'advance_received' : 'confirmed';
+            
+            JRData.updateBookingStatus(booking.id, targetStatus, `Price update approved by client. Final price: ${formatCurrency(booking.paymentLog ? booking.paymentLog.finalPrice : 13000)}`);
+
+            alert('Price approved successfully! Continuing with the order workflow.');
+            window.location.href = `../order_tracking/index.html?id=${booking.id}`;
+        }
+
+        applyLanguage(JRData.getLanguage());
+    </script>
+</body>
+</html>
